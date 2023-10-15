@@ -16,8 +16,8 @@ import { getCommonSlice } from '../store/_redux/common/service';
 import { GetUser, UserLogin } from '../firebase/firebase';
 import { getAuthSlice } from '../store/_redux/auth/service';
 const initialValues = {
-    "email": "oztas.yasinn@gmail.com",
-    "password": "test123"
+    "email": "",
+    "password": ""
 }
 const validationSchema = yup.object().shape({
     "email": yup.string().required("Email is a required field!!!"),
