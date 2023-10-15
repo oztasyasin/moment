@@ -43,14 +43,16 @@ const Mapper = (props) => {
             })
     };
     useEffect(() => {
-        dispatch(getCommonSlice().setLoading(true));
-        getLocationPermission()
-            .then((res) => {
-                if (res) {
-                    getLocationAsync();
-                }
-            })
-    }, []);
+        if (!props.location) {
+            dispatch(getCommonSlice().setLoading(true));
+            getLocationPermission()
+                .then((res) => {
+                    if (res) {
+                        getLocationAsync();
+                    }
+                })
+        }
+    }, [props]);
     return (
         <View style={defaults.location}>
             <MapView

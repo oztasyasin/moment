@@ -17,7 +17,7 @@ export function CameraView(props) {
             let photo = await cameraRef.current.takePictureAsync();
             if (type != Camera.Constants.Type.back) {
                 const manipResult = await ImageManipulator.manipulateAsync(
-                    photo.uri,
+                    newphoto.uri,
                     [{ flip: ImageManipulator.FlipType.Horizontal }],
                     { format: 'png' }
                 );
@@ -48,9 +48,14 @@ export function CameraView(props) {
             {
                 props.image && permit ?
                     <>
+                        <View style={{
+                            ...globalStyles.cameraTools,
+                            paddingVertical: 21
+                        }}>
+                            <Logo color={'white'} />
+                        </View>
                         <Image style={{
                             ...globalStyles.capturedImage,
-                            marginTop: 74
                         }} source={props.image} />
                         <View style={{
                             ...globalStyles.cameraTools,
@@ -84,15 +89,17 @@ export function CameraView(props) {
                                 </TouchableOpacity>
                             </View>
                             <Camera
-                                style={{ minWidth: fullWidth, height: '100%', maxWidth: 600, maxHeight: fullHeight * 0.65 }}
+                                style={{ minWidth: fullWidth, aspectRatio: 1, maxHeight: fullWidth, minHeight: fullWidth, height: fullWidth }}
                                 type={type}
                                 ref={cameraRef}
                             />
                             <View style={{
                                 ...globalStyles.cameraTools,
                                 width: fullWidth,
-                                paddingVertical: 16,
+                                minHeight: 200,
+                                paddingHorizontal: 48,
                                 justifyContent: 'space-between'
+
                             }}>
                                 <TouchableOpacity onPress={() => pickImage()}>
                                     <MaterialIcons name="image" size={42} color="white" />

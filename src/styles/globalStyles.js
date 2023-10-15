@@ -152,7 +152,7 @@ export const globalStyles = StyleSheet.create({
     },
     capturedImage: {
         maxWidth: fullWidth,
-        maxHeight: fullHeight * 0.65
+        maxHeight: fullWidth
     },
     settingsButton: {
         position: 'absolute',

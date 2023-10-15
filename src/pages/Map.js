@@ -30,7 +30,7 @@ const Map = () => {
     const currentlLocation = useSelector((state) => state.auth.location);
     const [location, setLocation] = useState(currentlLocation);
     const actionSheet = useRef(null);
-    const optionArray = ["Use Camera", "From Galery", "From Documents", "Cancel"];
+    const optionArray = ["Use Camera", "From Galery", "Cancel"];
     const [posts, setPosts] = useState(null);
     const [post, setPost] = useState(null);
     const [image, setImage] = useState(null);
@@ -58,6 +58,7 @@ const Map = () => {
             })
     }
     const openActionSheet = () => {
+
         actionSheet.current.show()
     }
     const openCamera = () => {
@@ -75,6 +76,7 @@ const Map = () => {
                 type: 'image/*',
             });
             if (result?.assets?.length != 0) {
+                const manipResult = await ImageManipulator.manipulateAsync(result.assets[0].uri, actions, { compress: 1 });
                 postSelectedImage(result.assets[0])
             }
         } catch (error) {
@@ -84,7 +86,9 @@ const Map = () => {
         try {
             const result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.All,
-                allowsEditing: false
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.5,
             });
             if (!result.canceled) {
                 postSelectedImage(result?.assets[0])
@@ -254,10 +258,11 @@ const Map = () => {
                         closeCamera={() => closeCamera()} /> : null
             }
             <ActionSheet
+                useNativeDriver={true}
                 ref={actionSheet}
                 title={'Select Image Source'}
                 options={optionArray}
-                cancelButtonIndex={3}
+                cancelButtonIndex={2}
                 onPress={(index) => actionSheetPress(index)}
             />
             {
