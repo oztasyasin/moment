@@ -18,10 +18,10 @@ const PostModal = (props) => {
             visible={props.visible}>
             <FavouriteCards nopadding post={post} />
             {
-                getAuthState()?.user?.uid !== post?.userId ?
+                getAuthState()?.user?.uid === post?.userId ?
                     <>
                         <Row ph={16} pv={12} end fullSize>
-                            <View style={{flex:1}}>
+                            <View style={{ flex: 1 }}>
                                 <Logo color={'black'} />
                             </View>
                             <TouchableOpacity onPress={() => props.share()}>

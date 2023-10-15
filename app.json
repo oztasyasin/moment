@@ -5,7 +5,13 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "permissions": [
-      "CAMERA_ROLL"
+      "CAMERA",
+      "CAMERA_ROLL",
+      "READ_EXTERNAL_STORAGE",
+      "WRITE_EXTERNAL_STORAGE",
+      "LOCATION",
+      "LOCATION_FOREGROUND",
+      "LOCATION_BACKGROUND"
     ],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -31,8 +37,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-        "expo-document-picker",
-        "expo-location"
+      "expo-document-picker",
+      "expo-location"
     ],
     "extra": {
       "eas": {
