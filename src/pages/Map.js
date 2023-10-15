@@ -157,39 +157,45 @@ const Map = () => {
     }
     const sharePost = async () => {
         dispatch(getCommonSlice().setLoading(true));
-        const address = await addressHelper(share.latitude, share.longitude);
-        const data = {
-            ...share,
-            address: address,
-            fileName: `${user?.uid}/posts/${share.id}`
-        }
-        const blob = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.onload = () => {
-                resolve(xhr.response)
+        try {
+            const address = await addressHelper(share.latitude, share.longitude);
+            const data = {
+                ...share,
+                address: address,
+                fileName: `${user?.uid}/posts/${share.id}`
             }
-            xhr.onerror = (e) => {
-                reject(new TypeError('Network request failed'))
-            }
-            xhr.responseType = 'blob';
-            xhr.open('GET', data.file.uri, true);
-            xhr.send(null);
-        })
-        Upload({ id: data.id, file: blob })
-            .then((res) => {
-                if (res) {
-                    delete data.file
-                    Add("post", { ...data, url: res, userId: user?.uid })
-                        .then((response) => {
-                            if (response) {
-                                getData();
-                            }
-                            dispatch(getCommonSlice().setLoading(false));
-                        })
+            const blob = await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.onload = () => {
+                    resolve(xhr.response)
                 }
-                dispatch(getCommonSlice().setLoading(false));
+                xhr.onerror = (e) => {
+                    reject(new TypeError('Network request failed'))
+                }
+                xhr.responseType = 'blob';
+                xhr.open('GET', data.file.uri, true);
+                xhr.send(null);
             })
-        setShare(() => { return null })
+            Upload({ id: data.id, file: blob })
+                .then((res) => {
+                    if (res) {
+                        delete data.file
+                        Add("post", { ...data, url: res, userId: user?.uid })
+                            .then((response) => {
+                                if (response) {
+                                    getData();
+                                }
+                                dispatch(getCommonSlice().setLoading(false));
+                            })
+                    }
+                    dispatch(getCommonSlice().setLoading(false));
+                })
+            setShare(() => { return null })
+        } catch (error) {
+            dispatch(getCommonSlice().setLoading(false));
+            alert(error)
+        }
+
     }
     const getData = () => {
         Get("post").
