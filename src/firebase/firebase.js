@@ -4,23 +4,23 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, in
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuthState } from "../store/_redux/auth/service";
-// const firebaseConfig = {
-//     apiKey: "AIzaSyCFYCFxUpGy_S5zr-GNPakdHsZMBO2r3rw",
-//     authDomain: "coordgraph.firebaseapp.com",
-//     projectId: "coordgraph",
-//     storageBucket: "coordgraph.appspot.com",
-//     messagingSenderId: "587138215449",
-//     appId: "1:587138215449:web:18d1694fe31d4490248488"
-// };
-
 const firebaseConfig = {
-    apiKey: "AIzaSyBRP6o5tyU3Qw0UoP6kVhKgk0bRL9cDbtU",
-    authDomain: "coordgraph2.firebaseapp.com",
-    projectId: "coordgraph2",
-    storageBucket: "coordgraph2.appspot.com",
-    messagingSenderId: "513325619720",
-    appId: "1:513325619720:web:cf960d02315f6172b50fbd"
+    apiKey: "AIzaSyCFYCFxUpGy_S5zr-GNPakdHsZMBO2r3rw",
+    authDomain: "coordgraph.firebaseapp.com",
+    projectId: "coordgraph",
+    storageBucket: "coordgraph.appspot.com",
+    messagingSenderId: "587138215449",
+    appId: "1:587138215449:web:18d1694fe31d4490248488"
 };
+
+// const firebaseConfig = {
+//     apiKey: "AIzaSyBRP6o5tyU3Qw0UoP6kVhKgk0bRL9cDbtU",
+//     authDomain: "coordgraph2.firebaseapp.com",
+//     projectId: "coordgraph2",
+//     storageBucket: "coordgraph2.appspot.com",
+//     messagingSenderId: "513325619720",
+//     appId: "1:513325619720:web:cf960d02315f6172b50fbd"
+// };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
