@@ -299,7 +299,7 @@ const Profile = ({ navigation, route }) => {
                 style={{ width: fullWidth, marginBottom: navBarHeight + statusBarHeight }}>
                 <Row fullSize wrap>
                     {
-                        fakePosts.map((item, i) => {
+                        posts?.map((item, i) => {
                             return (
                                 <PostItem
                                     key={i}
