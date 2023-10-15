@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Coordgraph",
+    "slug": "Coordgraph",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "permissions": [
+      "CAMERA_ROLL"
+    ],
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "requireFullScreen": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+        "expo-document-picker",
+        "expo-location"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e2edf6a5-4668-4841-97b4-3376e23ad11d"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e2edf6a5-4668-4841-97b4-3376e23ad11d"
+    }
+  }
+}
