@@ -15,12 +15,16 @@ export function CameraView(props) {
     const takePicture = async () => {
         if (cameraRef.current) {
             let photo = await cameraRef.current.takePictureAsync();
-            const manipResult = await ImageManipulator.manipulateAsync(
-                photo.uri,
-                [{ flip: ImageManipulator.FlipType.Horizontal }],
-                { format: 'png' }
-            );
-            props.setImage(() => { return manipResult })
+            if (type != Camera.Constants.Type.back) {
+                const manipResult = await ImageManipulator.manipulateAsync(
+                    photo.uri,
+                    [{ flip: ImageManipulator.FlipType.Horizontal }],
+                    { format: 'png' }
+                );
+                props.setImage(() => { return manipResult })
+            }
+            props.setImage(() => { return photo })
+
         }
     };
     const pickImage = () => {

@@ -112,7 +112,7 @@ export const Upload = async (data) => {
     try {
         const authStore = getAuthState();
         const storageRef = ref(storage, `${authStore?.user?.uid}/posts/${data?.id}`);
-        const result = await uploadBytes(storageRef, data.file);
+        const result = await uploadBytes(storageRef, data?.file);
         const downloadURL = await getDownloadURL(storageRef);
         return downloadURL;
     } catch (error) {

@@ -25,8 +25,8 @@ import { getCameraPermission } from '../helper/permissions';
 import PermissionModal from '../components/modals/PermissionModal';
 import * as Animatable from 'react-native-animatable';
 import { shareAsync } from 'expo-sharing';
-
 import uuid from 'react-native-uuid';
+import axios from 'axios';
 const Profile = ({ navigation, route }) => {
     const isFocused = useIsFocused();
     const selectedUser = route?.params?.user;
@@ -148,31 +148,36 @@ const Profile = ({ navigation, route }) => {
 
     }
     const sharePost = async () => {
-        startLoader();
-        const data = {
-            ...share,
-        }
-        const blob = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.onload = () => {
-                resolve(xhr.response)
+        try {
+            startLoader();
+            const data = {
+                ...share
             }
-            xhr.onerror = (e) => {
-                reject(new TypeError('Network request failed'))
+            const response = await axios.get(data.uri, {
+                responseType: 'blob',
+            });
+            if (response.status === 200) {
+                const blob = response.data
+                uploadProfilePhoto(blob)
+                    .then((res) => {
+                        if (res) {
+                            setPp(() => { return data.uri })
+                        }
+                        stopLoader();
+                        setShare(() => { return null })
+                    })
             }
-            xhr.responseType = 'blob';
-            xhr.open('GET', data.uri, true);
-            xhr.send(null);
-        })
-        uploadProfilePhoto(blob)
-            .then((res) => {
-                if (res) {
-                    setPp(() => { return data.uri })
-                }
+            else {
                 stopLoader();
-            })
+                setShare(() => { return null })
 
-        setShare(() => { return null })
+            }
+            stopLoader();
+        } catch (error) {
+            setShare(() => { return null })
+            stopLoader();
+        }
+
     }
     const logout = () => {
         dispatch(getAuthSlice().logout())
@@ -244,11 +249,11 @@ const Profile = ({ navigation, route }) => {
     }
     useEffect(() => {
         if (isFocused) {
-            setPost(() => { return null })
-            getData();
-            if (!pp) {
-                getPp();
-            }
+            // setPost(() => { return null })
+            // getData();
+            // if (!pp) {
+            //     getPp();
+            // }
         }
     }, [isFocused])
 
@@ -328,12 +333,16 @@ const Profile = ({ navigation, route }) => {
                         setImage={setImage}
                         closeCamera={() => closeCamera()} /> : null
             }
-            <PpModal
-                close={() => setShare(() => { return null })}
-                image={share}
-                upload={() => sharePost()}
-                visible={share != null}
-            />
+            {
+                share != null ?
+                    <PpModal
+                        close={() => setShare(() => { return null })}
+                        image={share}
+                        upload={() => sharePost()}
+                        visible={share != null}
+                    /> : null
+            }
+
             <PostModal
                 close={() => setPost(() => { return null })}
                 post={post}

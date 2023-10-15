@@ -28,18 +28,18 @@ const Home = () => {
     };
     useEffect(() => {
         if (isFocused) {
-            setPosts(() => { return null })
-            dispatch(getCommonSlice().setLoading(true))
-            Get('post')
-                .then((res) => {
-                    if (res) {
-                        setPosts(() => {
-                            return res
-                        })
-                        dispatch(getCommonSlice().setLoading(false))
-                    }
-                })
-            GetUser(getAuthState()?.user?.uid)
+            // setPosts(() => { return null })
+            // dispatch(getCommonSlice().setLoading(true))
+            // Get('post')
+            //     .then((res) => {
+            //         if (res) {
+            //             setPosts(() => {
+            //                 return res
+            //             })
+            //             dispatch(getCommonSlice().setLoading(false))
+            //         }
+            //     })
+            // GetUser(getAuthState()?.user?.uid)
         }
     }, [isFocused])
 

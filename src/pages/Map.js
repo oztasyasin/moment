@@ -22,6 +22,7 @@ import { Add, Delete, Get, Upload, deleteFile } from '../firebase/firebase'
 import { convertToBase64 } from '../helper/imageParser'
 import { getAuthSlice, getAuthState } from '../store/_redux/auth/service'
 import { getCameraPermission } from '../helper/permissions'
+import axios from 'axios';
 const Map = () => {
     const statusBarHeight = Constants.statusBarHeight;
     // const location = useSelector((state) => state.auth.location);
@@ -164,40 +165,46 @@ const Map = () => {
                 address: address,
                 fileName: `${user?.uid}/posts/${share.id}`
             }
-            const blob = await new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.onload = () => {
-                    resolve(xhr.response)
-                }
-                xhr.onerror = (e) => {
-                    reject(new TypeError('Network request failed'))
-                }
-                xhr.responseType = 'blob';
-                xhr.open('GET', data.file.uri, true);
-                xhr.send(null);
-            })
-            Upload({ id: data.id, file: blob })
-                .then((res) => {
-                    if (res) {
-                        delete data.file
-                        Add("post", { ...data, url: res, userId: user?.uid })
-                            .then((response) => {
-                                if (response) {
-                                    getData();
-                                }
-                                dispatch(getCommonSlice().setLoading(false));
-                            })
-                    }
-                    dispatch(getCommonSlice().setLoading(false));
-                })
+            const response = await fetch(data.url);
+            if (response.status === 200) {
+                const blob = await response.blob();
+                Upload({ id: data.id, file: blob })
+                    .then((res) => {
+                        if (res) {
+                            delete data.file
+                            Add("post", { ...data, url: res, userId: user?.uid })
+                                .then((response) => {
+                                    if (response) {
+                                        getData();
+                                    }
+                                    dispatch(getCommonSlice().setLoading(false));
+                                })
+                        }
+                        dispatch(getCommonSlice().setLoading(false));
+                    })
+            }
+            dispatch(getCommonSlice().setLoading(false));
             setShare(() => { return null })
         } catch (error) {
             dispatch(getCommonSlice().setLoading(false));
-            alert(error)
+            setShare(() => { return null })
         }
 
     }
+    const shareImage = () => {
+        const data = { ...post };
+        setPost(() => { return null })
+        startLoader();
+        downloadFile(data.url, uuid.v4())
+            .then((res) => {
+                stopLoader();
+                if (res?.status === 200) {
+                    shareAsync(res.uri)
+                }
+            })
+    }
     const getData = () => {
+        dispatch(getCommonSlice().setLoading(true));
         Get("post").
             then((res) => {
                 if (res) {
@@ -205,10 +212,12 @@ const Map = () => {
                         return res
                     })
                 }
+                dispatch(getCommonSlice().setLoading(false));
+
             })
     }
     useEffect(() => {
-        getData();
+        // getData();
     }, [])
 
     return (
@@ -235,6 +244,7 @@ const Map = () => {
             <PostModal
                 close={() => setPost(() => { return null })}
                 post={post}
+                share={() => shareImage()}
                 delete={() => deletePost()}
                 visible={post != null} />
             {
@@ -253,11 +263,15 @@ const Map = () => {
                 cancelButtonIndex={3}
                 onPress={(index) => actionSheetPress(index)}
             />
-            <ApprovePost
-                close={() => setShare(() => { return null })}
-                post={share}
-                sharePost={() => sharePost()}
-                visible={share != null} />
+            {
+                share != null ?
+                    < ApprovePost
+                        close={() => setShare(() => { return null })}
+                        post={share}
+                        sharePost={() => sharePost()}
+                        visible={share != null} /> : null
+            }
+
         </Container>
     )
 }
