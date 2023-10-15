@@ -249,11 +249,11 @@ const Profile = ({ navigation, route }) => {
     }
     useEffect(() => {
         if (isFocused) {
-            // setPost(() => { return null })
-            // getData();
-            // if (!pp) {
-            //     getPp();
-            // }
+            setPost(() => { return null })
+            getData();
+            if (!pp) {
+                getPp();
+            }
         }
     }, [isFocused])
 

@@ -204,7 +204,6 @@ const Map = () => {
             })
     }
     const getData = () => {
-        dispatch(getCommonSlice().setLoading(true));
         Get("post").
             then((res) => {
                 if (res) {
@@ -212,12 +211,10 @@ const Map = () => {
                         return res
                     })
                 }
-                dispatch(getCommonSlice().setLoading(false));
-
             })
     }
     useEffect(() => {
-        // getData();
+        getData();
     }, [])
 
     return (
