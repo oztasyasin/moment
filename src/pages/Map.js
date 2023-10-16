@@ -254,6 +254,7 @@ const Map = () => {
 
     useEffect(() => {
         if (isFocused) {
+            stopLoader();
             Get()
                 .then((res) => {
                     if (res) {

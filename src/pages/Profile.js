@@ -243,6 +243,7 @@ const Profile = ({ navigation, route }) => {
     }
     useEffect(() => {
         if (isFocused) {
+            stopLoader();
             Get()
                 .then((res) => {
                     if (res) {

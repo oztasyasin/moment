@@ -28,22 +28,24 @@ const Home = () => {
     };
     useEffect(() => {
         if (isFocused) {
+            dispatch(getCommonSlice().setLoading(false))
             Get()
                 .then((res) => {
                     if (res) {
                         dispatch(getCommonSlice().setUrl(res))
                     }
-                })
-            dispatch(getCommonSlice().setLoading(true))
-            dispatch(postActions.GetAll())
-                .then((res) => {
-                    if (res) {
-                        setPosts(() => {
-                            return res
+                    dispatch(getCommonSlice().setLoading(true))
+                    dispatch(postActions.GetAll())
+                        .then((res) => {
+                            if (res) {
+                                setPosts(() => {
+                                    return res
+                                })
+                                dispatch(getCommonSlice().setLoading(false))
+                            }
                         })
-                        dispatch(getCommonSlice().setLoading(false))
-                    }
                 })
+
         }
     }, [isFocused])
 
