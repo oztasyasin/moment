@@ -35,7 +35,7 @@ export const Get = async () => {
                 uniqid: doc.id,
             })
         });
-        return data[0];
+        return data[0].Url;
     } catch (error) {
         return null;
     }
