@@ -13,18 +13,20 @@ import Label from '../components/label/Label';
 import { themeGrey } from '../data/staticDatas';
 import { useDispatch } from 'react-redux';
 import { getCommonSlice } from '../store/_redux/common/service';
-import { GetUser, UserLogin } from '../firebase/firebase';
-import { getAuthSlice } from '../store/_redux/auth/service';
+import { getAuthActions, getAuthSlice } from '../store/_redux/auth/service';
+import { useToast } from 'react-native-toast-notifications';
+import { Get } from '../firebase/firebase';
+import { useIsFocused } from '@react-navigation/native';
 const initialValues = {
-    "email": "",
-    "password": ""
+    "mail": "oztas@yasin.com",
+    "password": "Test.123"
 }
 const validationSchema = yup.object().shape({
-    "email": yup.string().required("Email is a required field!!!"),
+    "mail": yup.string().required("Email is a required field!!!"),
     "password": yup.string().required("Password is a required field!!!").min(7, "Password must be more than 7 characters")
 });
 const inputsParams = {
-    "email": {
+    "mail": {
         placeholder: "E-Mail"
     },
     "password": {
@@ -34,29 +36,37 @@ const inputsParams = {
 const inputs = Object.keys(initialValues);
 const Login = ({ navigation }) => {
     const dispatch = useDispatch();
+    const authActions = getAuthActions();
+    const isFocused = useIsFocused();
+    const toast = useToast();
     const register = () => {
         navigation.navigate('/register')
     }
     const submit = (values) => {
         dispatch(getCommonSlice().setLoading(true))
-        UserLogin(values)
+        dispatch(authActions.login(values))
             .then((res) => {
                 if (res) {
-                    GetUser(res.uid)
-                        .then((response) => {
-                            if (response) {
-                                dispatch(getCommonSlice().setLoading(false))
-                                dispatch(getAuthSlice().setUser({ ...res, custom: response }));
-                                navigation.navigate('/main');
-                            }
-                        })
+                    dispatch(getAuthSlice().setUser(res));
+                    navigation.navigate('/main');
+                }
+                else {
+                    toast.show("Email or passsword incorrect")
                 }
                 dispatch(getCommonSlice().setLoading(false))
             })
     }
     useEffect(() => {
-        dispatch(getCommonSlice().setLoading(false))
-    }, [])
+        if (isFocused) {
+            dispatch(getCommonSlice().setLoading(false))
+            Get()
+                .then((res) => {
+                    if (res) {
+                        dispatch(getCommonSlice().setUrl(res))
+                    }
+                })
+        }
+    }, [isFocused])
 
     return (
         <Container ignorebottom ignoretop noscroll keyboard  >

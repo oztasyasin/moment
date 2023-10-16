@@ -39,6 +39,7 @@ export const Slice = createSlice({
         },
         setUser: (state, action) => {
             state.user = action.payload;
+            state.token = action.payload.token;
         },
 
         setLocation: (state, action) => {
@@ -50,8 +51,8 @@ export const Slice = createSlice({
         logout: (state) => {
             state.address = null;
             state.user = null;
-            state. token = null;
-            state. location = null;
+            state.token = null;
+            state.location = null;
         },
     }
 });

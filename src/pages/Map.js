@@ -18,13 +18,20 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import ActionSheet from 'react-native-actionsheet';
 import ApprovePost from '../components/modals/ApprovePost'
-import { Add, Delete, Get, Upload, deleteFile } from '../firebase/firebase'
-import { convertToBase64 } from '../helper/imageParser'
 import { getAuthSlice, getAuthState } from '../store/_redux/auth/service'
 import { getCameraPermission } from '../helper/permissions'
-import axios from 'axios';
+import * as postActions from '../store/_redux/post/action';
+import { useIsFocused } from '@react-navigation/native'
+import { getPureUrl, ppHelper } from '../helper/ppHelper'
+import { downloadFile } from '../helper/pickers';
+import { shareAsync } from 'expo-sharing';
+import DeleteModal from '../components/modals/DeleteModal'
+import { useToast } from 'react-native-toast-notifications';
+
 const Map = () => {
     const statusBarHeight = Constants.statusBarHeight;
+    const isFocused = useIsFocused();
+    const toast = useToast();
     // const location = useSelector((state) => state.auth.location);
     const [address, setAddress] = useState(null)
     const currentlLocation = useSelector((state) => state.auth.location);
@@ -38,6 +45,13 @@ const Map = () => {
     const isLoading = useSelector((state) => state.common.loading);
     const camera = useSelector((state) => state.common.camera);
     const user = getAuthState().user;
+    const [deletedItem, setDeletedItem] = useState(null);
+    const startLoader = () => {
+        dispatch(getCommonSlice().setLoading(true));
+    }
+    const stopLoader = () => {
+        dispatch(getCommonSlice().setLoading(false));
+    }
     const dispatch = useDispatch();
     const getDetails = (item) => {
         addressHelper(location.latitude, location.longitude)
@@ -80,6 +94,7 @@ const Map = () => {
                 postSelectedImage(result.assets[0])
             }
         } catch (error) {
+            toast.show(error)
         }
     };
     const pickImage = async () => {
@@ -94,7 +109,7 @@ const Map = () => {
                 postSelectedImage(result?.assets[0])
             }
         } catch (error) {
-            return
+            toast.show(error)
         }
 
     };
@@ -144,54 +159,68 @@ const Map = () => {
         dispatch(getCommonSlice().setCamera(false))
 
     }
+    const openDeleteModal = () => {
+        const data = { ...post }
+        setDeletedItem(() => {
+            return data
+        })
+        setPost(() => {
+            return null
+        })
+
+    }
     const deletePost = () => {
-        Delete("post", post.uniqid)
+        startLoader();
+        dispatch(postActions.DeletePost({ id: deletedItem.id }))
             .then((res) => {
                 if (res) {
-                    deleteFile(post.id)
-                        .then((response) => {
-                            if (response) {
-                                getData();
-                            }
-                        })
+                    getData();
+                    toast.show("Post deleted successfuly")
                 }
-                setPost(() => {
-                    return null
-                })
+                else {
+                    toast.show("Something went wrong")
+
+                }
+                setDeletedItem(() => { return null })
             })
     }
     const sharePost = async () => {
-        dispatch(getCommonSlice().setLoading(true));
+        startLoader();
+        const data = {
+            ...share,
+            address: address,
+            fileName: `${user?.uid}/posts/${share.id}`
+        }
+        setShare(() => { return null })
         try {
             const address = await addressHelper(share.latitude, share.longitude);
-            const data = {
-                ...share,
-                address: address,
-                fileName: `${user?.uid}/posts/${share.id}`
-            }
-            const response = await fetch(data.url);
-            if (response.status === 200) {
-                const blob = await response.blob();
-                Upload({ id: data.id, file: blob })
-                    .then((res) => {
-                        if (res) {
-                            delete data.file
-                            Add("post", { ...data, url: res, userId: user?.uid })
-                                .then((response) => {
-                                    if (response) {
-                                        getData();
-                                    }
-                                    dispatch(getCommonSlice().setLoading(false));
-                                })
-                        }
-                        dispatch(getCommonSlice().setLoading(false));
-                    })
-            }
-            dispatch(getCommonSlice().setLoading(false));
-            setShare(() => { return null })
+
+            const formData = new FormData();
+            formData.append("file", {
+                uri: data.url,
+                type: 'image/jpeg',
+                name: 'image.jpg'
+            });
+            formData.append("userId", user?.id);
+            formData.append("userName", user?.userName);
+            formData.append("profilePhotoUrl", getPureUrl(user?.profilePhoto));
+            formData.append("date", data.date);
+            formData.append("latitude", data.latitude);
+            formData.append("longitude", data.longitude);
+            formData.append("address", address);
+            dispatch(postActions.AddPost(formData))
+                .then((res) => {
+                    if (res) {
+                        getData();
+                        toast.show("Post uploaded successfuly")
+                    }
+                    else {
+                        toast.show("Something went wrong");
+                    }
+                })
         } catch (error) {
-            dispatch(getCommonSlice().setLoading(false));
-            setShare(() => { return null })
+            toast.show(error);
+            stopLoader();
         }
 
     }
@@ -199,7 +228,7 @@ const Map = () => {
         const data = { ...post };
         setPost(() => { return null })
         startLoader();
-        downloadFile(data.url, uuid.v4())
+        downloadFile(ppHelper(data.photoUrl), uuid.v4())
             .then((res) => {
                 stopLoader();
                 if (res?.status === 200) {
@@ -208,18 +237,26 @@ const Map = () => {
             })
     }
     const getData = () => {
-        Get("post").
-            then((res) => {
+        startLoader();
+        dispatch(postActions.GetAll())
+            .then((res) => {
                 if (res) {
                     setPosts(() => {
                         return res
                     })
                 }
+                if(location){
+                    stopLoader();
+                }
             })
     }
+
     useEffect(() => {
-        getData();
-    }, [])
+        if (isFocused) {
+            setDeletedItem(() => { return null })
+            getData();
+        }
+    }, [isFocused])
 
     return (
         <Container noscroll ignorebottom>
@@ -246,7 +283,7 @@ const Map = () => {
                 close={() => setPost(() => { return null })}
                 post={post}
                 share={() => shareImage()}
-                delete={() => deletePost()}
+                delete={() => openDeleteModal()}
                 visible={post != null} />
             {
                 camera ?
@@ -272,6 +309,14 @@ const Map = () => {
                         post={share}
                         sharePost={() => sharePost()}
                         visible={share != null} /> : null
+            }
+            {
+                deletedItem ?
+                    < DeleteModal
+                        close={() => setDeletedItem(() => { return null })}
+                        delete={() => deletePost()}
+                        visible={deletedItem != null}
+                    /> : null
             }
 
         </Container>

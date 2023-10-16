@@ -10,31 +10,16 @@ import { getAdaptedWidth } from '../../helper/sizeAdapter'
 
 const ApprovePost = (props) => {
     const { post } = props
-    const [flag, setFlag] = useState(false)
-    const press = () => {
-        setFlag(() => {
-            return true
-        })
-        props.sharePost()
-    }
-    const close = () => {
-        if (!flag) {
-            props.close()
-        }
-    }
     return (
         <BaseModal
-            close={() => close()}
+            close={() => props.close()}
             visible={props.visible}>
             <FavouriteCards now post={post} />
             <Button
                 style={{ maxWidth: getAdaptedWidth(320), minWidth: getAdaptedWidth(320) }}
-                disabled={flag}
-                withLoading
-                isLoading={flag}
                 text={"Share"}
                 mb={16}
-                press={() => press()}
+                press={() => props.sharePost()}
                 color={'black'} />
 
         </BaseModal>

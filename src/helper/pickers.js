@@ -47,7 +47,6 @@ export const downloadFile = async (uri, name) => {
 
         return result
     } catch (error) {
-        console.error(error);
         return null
     }
 }

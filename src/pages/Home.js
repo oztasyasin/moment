@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { FlatList, Platform, Text, View } from 'react-native'
 import { fakePosts, fullWidth } from '../data/staticDatas';
 import { addressHelper } from '../helper/addresHelper';
-import { Get, GetUser } from '../firebase/firebase';
 import Container from '../components/container/Container';
 import FavouriteCards from '../components/FavouriteCards';
 import Header from '../components/Header';
@@ -11,7 +10,7 @@ import { getCommonSlice } from '../store/_redux/common/service';
 import { useIsFocused } from '@react-navigation/native';
 import { getAuthState } from '../store/_redux/auth/service';
 import Constants from 'expo-constants';
-
+import * as postActions from '../store/_redux/post/action';
 // const Container = lazy(() => import('../components/container/Container'));
 // const FavouriteCards = lazy(() => import('../components/FavouriteCards'));
 // const Header = lazy(() => import('../components/Header'));
@@ -28,9 +27,8 @@ const Home = () => {
     };
     useEffect(() => {
         if (isFocused) {
-            setPosts(() => { return null })
             dispatch(getCommonSlice().setLoading(true))
-            Get('post')
+            dispatch(postActions.GetAll())
                 .then((res) => {
                     if (res) {
                         setPosts(() => {
@@ -39,7 +37,6 @@ const Home = () => {
                         dispatch(getCommonSlice().setLoading(false))
                     }
                 })
-            GetUser(getAuthState()?.user?.uid)
         }
     }, [isFocused])
 

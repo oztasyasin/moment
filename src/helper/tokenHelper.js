@@ -1,5 +1,5 @@
-import { getAuthStore } from "../store/_redux/auth/service"
-
+import store from "../store/Store";
 export const getToken = () => {
-    return getAuthStore().token;
+    const authState = store.getState().auth;
+    return authState.token;
 }

@@ -12,9 +12,11 @@ import Post from './Post';
 import { getAuthSlice } from '../../store/_redux/auth/service';
 import { addressHelper, getCurrentPosition } from '../../helper/addresHelper';
 import { getLocationPermission } from '../../helper/permissions';
+import { ppHelper } from '../../helper/ppHelper';
 const Mapper = (props) => {
     const [region, setRegion] = useState(null);
     const isLoading = useSelector((state) => state.common.loading);
+    const [points, setPoints] = useState(props.locations);
     const dispatch = useDispatch();
     const handleMapPress = (event) => {
         if (!props.requestPage) {
@@ -52,7 +54,7 @@ const Mapper = (props) => {
                     }
                 })
         }
-    }, [props]);
+    }, []);
     return (
         <View style={defaults.location}>
             <MapView
@@ -90,7 +92,7 @@ const Mapper = (props) => {
                                                 longitude: item.longitude,
                                             }}
                                         >
-                                            <Image style={globalStyles.markerImage} source={{ uri: item.url }} />
+                                            <Image style={globalStyles.markerImage} source={{ uri: ppHelper(item.photoUrl) }} />
                                         </Marker>
                                     )
 

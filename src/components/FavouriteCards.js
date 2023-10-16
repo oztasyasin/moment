@@ -1,59 +1,27 @@
-import React, { useEffect, useState, Fragment, memo } from 'react'
+import React, { useEffect,memo } from 'react'
 import { View, Image, TouchableOpacity } from 'react-native'
 import { globalStyles } from '../styles/globalStyles'
-import { fakePosts, fakeUser, themeGrey, themeRed } from '../data/staticDatas'
+import { themeGrey, themeRed } from '../data/staticDatas'
 import Label from '../components/label/Label';
-import { addressHelper } from '../helper/addresHelper';
 import Row from '../components/row/Row';
 import { dateDistance } from '../helper/dateDistance';
 import { Ionicons } from '@expo/vector-icons';
-import { GetUser, getImageLink } from '../firebase/firebase';
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Logo from './svg/Logo';
+import { ppHelper } from '../helper/ppHelper';
+import { isEmpty } from '../helper/isEmpty';
 const FavouriteCards = (props) => {
     const navigation = useNavigation();
     const { post, now } = props;
-    const [address, setAddress] = useState(post.address);
     const today = new Date();
     const postDate = new Date(post.date);
     const zamanFarki = dateDistance(today, postDate);
-    const [url, setUrl] = useState(null);
-    const [pp, setPp] = useState(null);
-    const [user, setUser] = useState(null);
     const goProfile = () => {
-        // navigation.navigate('/profile')
-        
+
     }
     useEffect(() => {
-        if (address == null || typeof address === 'undefined') {
-            addressHelper(post.latitude, post.longitude)
-                .then((res) => {
-                    setAddress(() => {
-                        return res
-                    })
-                })
-        }
-        getImageLink(`${post.fileName}`)
-            .then((res) => {
-                if (res) {
-                    setUrl(() => { return res })
-                }
-            })
-        getImageLink(`${post.userId}/profilePhoto`)
-            .then((res) => {
-                if (res) {
-                    setPp(() => {
-                        return res
-                    })
-                }
-            })
-        GetUser(post?.userId)
-            .then((res) => {
-                if (res) {
-                    setUser(() => { return res })
-                }
-            })
+
     }, [])
 
     return (
@@ -66,17 +34,16 @@ const FavouriteCards = (props) => {
                     !now ?
                         <TouchableOpacity onPress={() => goProfile()} style={globalStyles.postProfile}>
                             {
-                                pp ?
-                                    <Image style={globalStyles.favouritePp} source={{ uri: pp }} /> :
+                                !isEmpty(post.profilePhotoURL) ?
+                                    <Image
+                                        style={globalStyles.favouritePp}
+                                        source={{ uri: ppHelper(post.profilePhotoURL) }} /> :
                                     <FontAwesome
                                         name="user-circle"
                                         size={40}
                                         color={themeGrey} />
                             }
-                            {
-                                user ?
-                                    <Label font={[600, 12, 14]} style={{ marginLeft: 8 }} color={themeGrey} text={`@${user?.userName}`} /> : null
-                            }
+                            <Label font={[600, 12, 14]} style={{ marginLeft: 8 }} color={themeGrey} text={`@${post?.userName}`} />
                         </TouchableOpacity> :
                         <Logo color={'black'} />
                 }
@@ -88,12 +55,12 @@ const FavouriteCards = (props) => {
                     style={{ marginRight: 6 }}
                     font={[400, 10, 12]}
                     color={themeGrey}
-                    text={address ? address : post.address} />
+                    text={post.address} />
                 <Ionicons name="location" size={16} color={themeRed} />
             </Row>
             <Image
                 style={globalStyles.favouriteImg}
-                source={{ uri: url ? url : post.url }} />
+                source={{ uri: now ? post.url : ppHelper(post.photoUrl) }} />
         </View>
     )
 }

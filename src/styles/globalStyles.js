@@ -18,6 +18,7 @@ export const globalStyles = StyleSheet.create({
         minWidth: fullWidth,
         paddingHorizontal: 16,
         paddingVertical: 48,
+        overflow:'hidden'
     },
     profileImg: {
         height: 100,

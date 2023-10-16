@@ -2,15 +2,14 @@ import React, { useEffect, useRef, useState } from 'react'
 import Container from '../components/container/Container'
 import { globalStyles } from '../styles/globalStyles'
 import Row from '../components/row/Row';
-import { FlatList, Image, Animated, Easing, ScrollView } from 'react-native';
-import { fakePosts, fakeUser, fullHeight, fullWidth, navBarHeight, statusBarHeight, themeGrey } from '../data/staticDatas';
+import { Image, Animated, ScrollView } from 'react-native';
+import { fullWidth, navBarHeight, statusBarHeight, themeGrey } from '../data/staticDatas';
 import ProfilePlaces from '../components/ProfilePlaces';
 import Label from '../components/label/Label';
 import PostItem from '../components/PostITem';
 import PostModal from '../components/modals/PostModal';
-import { Delete, GetUserPosts, deleteFile, getImageLink, uploadProfilePhoto } from '../firebase/firebase';
 import { useIsFocused } from '@react-navigation/native';
-import { getAuthSlice, getAuthState } from '../store/_redux/auth/service';
+import { getAuthActions, getAuthSlice, getAuthState } from '../store/_redux/auth/service';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCommonSlice } from '../store/_redux/common/service';
 import EditButton from '../components/EditButton';
@@ -23,12 +22,16 @@ import LogoutButton from '../components/LogoutButton';
 import { persistor } from '../store/Store';
 import { getCameraPermission } from '../helper/permissions';
 import PermissionModal from '../components/modals/PermissionModal';
-import * as Animatable from 'react-native-animatable';
 import { shareAsync } from 'expo-sharing';
 import uuid from 'react-native-uuid';
-import axios from 'axios';
+import { ppHelper } from '../helper/ppHelper';
+import { useToast } from 'react-native-toast-notifications';
+import { renderToast } from '../helper/toasterHelper';
+import * as postActions from '../store/_redux/post/action';
+import DeleteModal from '../components/modals/DeleteModal';
 const Profile = ({ navigation, route }) => {
     const isFocused = useIsFocused();
+    const toast = useToast();
     const selectedUser = route?.params?.user;
     const actionSheet = useRef(null);
     const optionArray = ["Use Camera", "From Galery", "Cancel"];
@@ -41,8 +44,9 @@ const Profile = ({ navigation, route }) => {
     const addressArr = address?.split(', ');
     const city = address ? addressArr[addressArr?.length - 2] : 'Unknown'
     const [permission, setPermission] = useState(null);
-    const top = useState(new Animated.Value(300))[0];
+    const top = useState(new Animated.Value(0))[0];
     const [y, setY] = useState(null)
+    const [deletedItem, setDeletedItem] = useState(null)
     const selectPost = (item) => {
         navigation.navigate('/postDetails', { post: item })
     }
@@ -62,42 +66,52 @@ const Profile = ({ navigation, route }) => {
             })
     }
     const [posts, setPosts] = useState(null);
-    const [pp, setPp] = useState(null);
     const user = getAuthState().user;
+    const [pp, setPp] = useState(user?.profilePhoto);
     const dispatch = useDispatch();
     const getDetails = (item) => {
         setPost(() => {
             return item
         })
     }
+    const openDeleteModal = () => {
+        const data = { ...post }
+        setPost(() => {
+            return null
+        })
+        setDeletedItem(() => {
+            return post
+        })
+    }
     const deletePost = () => {
         startLoader()
-        Delete("post", post.uniqid)
+        dispatch(postActions.DeletePost({ Id: deletedItem.id }))
             .then((res) => {
+                setPost(() => { return null })
                 if (res) {
-                    deleteFile(post.id)
-                        .then((response) => {
-                            if (response) {
-                                getData();
-                            }
-                        })
+                    getData()
+                    toast.show("Post deleted successfuly")
                 }
-                setPost(() => {
+                else {
+                    stopLoader();
+                    toast.show("Something went wrong")
+
+                }
+                setDeletedItem(() => {
                     return null
                 })
-                stopLoader()
             })
     }
     const getData = () => {
         startLoader()
-        GetUserPosts(selectedUser ? selectedUser?.id : user?.uid)
+        dispatch(postActions.GetByUserId(user?.id))
             .then((res) => {
                 if (res) {
                     setPosts(() => {
                         return res;
                     })
+                    stopLoader();
                 }
-                stopLoader();
             })
     }
 
@@ -109,14 +123,7 @@ const Profile = ({ navigation, route }) => {
     const closeCamera = () => {
         dispatch(getCommonSlice().setCamera(false))
     }
-    const getPp = () => {
-        getImageLink(`${user?.uid}/profilePhoto`)
-            .then((res) => {
-                setPp(() => {
-                    return res
-                })
-            })
-    }
+
     const pickImage = async () => {
         imagePicker()
             .then((res) => {
@@ -148,33 +155,33 @@ const Profile = ({ navigation, route }) => {
 
     }
     const sharePost = async () => {
+        const data = {
+            ...share
+        }
+        setShare(() => { return null })
+        startLoader();
         try {
-            startLoader();
-            const data = {
-                ...share
-            }
-            const response = await axios.get(data.uri, {
-                responseType: 'blob',
+            const formData = new FormData();
+            formData.append("file", {
+                uri: data.uri,
+                type: 'image/jpeg',
+                name: 'image.jpg'
             });
-            if (response.status === 200) {
-                const blob = response.data
-                uploadProfilePhoto(blob)
-                    .then((res) => {
-                        if (res) {
-                            setPp(() => { return data.uri })
-                        }
-                        stopLoader();
-                        setShare(() => { return null })
-                    })
-            }
-            else {
-                stopLoader();
-                setShare(() => { return null })
+            formData.append("userId", user?.id);
+            dispatch(getAuthActions()
+                .uploadProfilePhoto(formData))
+                .then((res) => {
+                    if (res) {
+                        setPp(() => { return ppHelper(res) })
+                        toast.show("Profile photo added successfuly")
+                    }
+                    else {
+                        toast.show("Something went wrong")
+                    }
+                    stopLoader();
+                })
 
-            }
-            stopLoader();
         } catch (error) {
-            setShare(() => { return null })
             stopLoader();
         }
 
@@ -189,7 +196,7 @@ const Profile = ({ navigation, route }) => {
         const data = { ...post };
         setPost(() => { return null })
         startLoader();
-        downloadFile(data.url, uuid.v4())
+        downloadFile(ppHelper(data.photoUrl), uuid.v4())
             .then((res) => {
                 stopLoader();
                 if (res?.status === 200) {
@@ -203,17 +210,6 @@ const Profile = ({ navigation, route }) => {
     const stopLoader = () => {
         dispatch(getCommonSlice().setLoading(false));
     }
-    const handleScrollTop = () => {
-        const toValue = 300;
-        setHide(() => { return false })
-        Animated.timing(top, {
-            toValue,
-            duration: 1000,
-            useNativeDriver: false,
-        }).start(() => {
-
-        });
-    }
 
     const handleScrollBegin = (event) => {
         const { contentOffset } = event.nativeEvent;
@@ -223,8 +219,17 @@ const Profile = ({ navigation, route }) => {
     const handleScrollEnd = (event) => {
         const { contentOffset } = event.nativeEvent;
         const endY = contentOffset.y;
-        console.log("başlangıç: " + y + "   bitiş:  " + endY);
         if (y < endY) {
+            const toValue = -295;
+            setHide(() => { return true })
+            Animated.timing(top, {
+                toValue,
+                duration: 500,
+                useNativeDriver: false,
+            }).start(() => {
+            });
+        }
+        else {
             const toValue = 0;
             setHide(() => { return false })
             Animated.timing(top, {
@@ -232,18 +237,6 @@ const Profile = ({ navigation, route }) => {
                 duration: 500,
                 useNativeDriver: false,
             }).start(() => {
-
-            });
-        }
-        else {
-            const toValue = 300;
-            setHide(() => { return false })
-            Animated.timing(top, {
-                toValue,
-                duration: 500,
-                useNativeDriver: false,
-            }).start(() => {
-
             });
         }
     }
@@ -251,51 +244,60 @@ const Profile = ({ navigation, route }) => {
         if (isFocused) {
             setPost(() => { return null })
             getData();
-            if (!pp) {
-                getPp();
-            }
+            const toValue = 0;
+            setHide(() => { return false })
+            Animated.timing(top, {
+                toValue,
+                duration: 500,
+                useNativeDriver: false,
+            }).start(() => {
+            });
         }
     }, [isFocused])
 
     return (
         <Container ignorebottom noscroll>
-            <Animated.View style={{ width: fullWidth, height: top }}>
-                <Row
-                    center
-                    vertical
-                    style={globalStyles.profileFrame}>
-                    <LogoutButton press={() => logout()} />
-                    {
-                        pp ?
-                            <Image
-                                style={globalStyles.profileImg}
-                                source={{ uri: pp }} /> :
-                            <FontAwesome
-                                name="user-circle"
-                                size={100}
-                                color="white" />
-                    }
+            <Animated.View style={{ width: fullWidth, marginTop: top }}>
+                {
+                    <Row
+                        center
+                        vertical
+                        style={globalStyles.profileFrame}>
+                        <LogoutButton press={() => logout()} />
+                        {
+                            pp ?
+                                <Image
+                                    style={globalStyles.profileImg}
+                                    source={{ uri: pp }} /> :
+                                <FontAwesome
+                                    name="user-circle"
+                                    size={100}
+                                    color="white" />
+                        }
 
-                    <Label
-                        mt={8}
-                        font={[600, 16, 18]}
-                        color={themeGrey}
-                        text={`@${user?.custom?.userName}`} />
-                    <Row mt={24} center>
-                        <ProfilePlaces
-                            title={"Posts"}
-                            content={posts ? posts?.length : 0} />
-                        <ProfilePlaces
-                            left
-                            title={"Age"}
-                            content={fakeUser.age} />
-                        <ProfilePlaces
-                            left
-                            title={"Location"}
-                            content={city} />
+                        <Label
+                            mt={8}
+                            font={[600, 16, 18]}
+                            color={themeGrey}
+                            text={`@${user?.userName}`} />
+                        <Row mt={24} center>
+                            <ProfilePlaces
+                                title={"Posts"}
+                                content={posts ? posts?.length : 0} />
+                            {/* <ProfilePlaces
+                                left
+                                title={"Age"}
+                                content={"Not Set"} />
+                            <ProfilePlaces
+                                left
+                                title={"Location"}
+                                content={city} /> */}
+                        </Row>
+                        <EditButton press={() => edit()} />
                     </Row>
-                    <EditButton press={() => edit()} />
-                </Row>
+
+                }
+
 
             </Animated.View>
             <ScrollView
@@ -310,7 +312,7 @@ const Profile = ({ navigation, route }) => {
                                     key={i}
                                     longPress={() => longPressPost(item)}
                                     press={() => getDetails(item)}
-                                    url={item.url} />
+                                    url={ppHelper(item.photoUrl)} />
                             )
                         })
                     }
@@ -342,12 +344,20 @@ const Profile = ({ navigation, route }) => {
                         visible={share != null}
                     /> : null
             }
+            {
+                deletedItem ?
+                    < DeleteModal
+                        close={() => setDeletedItem(() => { return null })}
+                        delete={() => deletePost()}
+                        visible={deletedItem != null}
+                    /> : null
+            }
 
             <PostModal
                 close={() => setPost(() => { return null })}
                 post={post}
                 share={() => shareImage()}
-                delete={() => deletePost()}
+                delete={() => openDeleteModal()}
                 visible={post != null} />
             <PermissionModal
                 close={() => setPermission(() => { return null })}

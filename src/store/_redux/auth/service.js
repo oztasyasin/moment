@@ -10,11 +10,6 @@ export const getAuthActions = () => {
     return actions;
 }
 
-export const login =(data)=>{
-    return getAuthActions().login(data);
-}
-
-
 export const getAuthState = () => {
     const authStore = store.getState().auth;
     return authStore;
