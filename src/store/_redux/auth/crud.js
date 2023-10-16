@@ -5,7 +5,7 @@ const baseUrl = getUrl();
 export const login = (data) => {
     var config = {
         method: 'post',
-        url: baseUrl + "/api/auth/login",
+        url: getUrl() + "/api/auth/login",
         headers: {
             'Content-Type': 'application/json',
         },
@@ -17,7 +17,7 @@ export const login = (data) => {
 export const register = (data) => {
     var config = {
         method: 'post',
-        url: baseUrl + "/api/auth/register",
+        url: getUrl() + "/api/auth/register",
         headers: {
             'Content-Type': 'application/json',
         },
@@ -29,7 +29,7 @@ export const register = (data) => {
 export const uploadProfilePhoto = (data) => {
     var config = {
         method: 'post',
-        url: baseUrl + "/api/auth/uploadProfilePhoto",
+        url: getUrl() + "/api/auth/uploadProfilePhoto",
         headers: {
             'Content-Type': 'multipart/form-data',
             "Authorization": "Bearer " + getToken()
