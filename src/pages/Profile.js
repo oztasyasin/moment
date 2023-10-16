@@ -69,6 +69,7 @@ const Profile = ({ navigation, route }) => {
     const [posts, setPosts] = useState(null);
     const user = getAuthState().user;
     const [pp, setPp] = useState(user?.profilePhoto);
+    console.log(pp);
     const dispatch = useDispatch();
     const getDetails = (item) => {
         setPost(() => {
@@ -172,6 +173,7 @@ const Profile = ({ navigation, route }) => {
             dispatch(getAuthActions()
                 .uploadProfilePhoto(formData))
                 .then((res) => {
+                    stopLoader();
                     if (res) {
                         setPp(() => { return ppHelper(res) })
                         toast.show("Profile photo added successfuly")
@@ -179,7 +181,6 @@ const Profile = ({ navigation, route }) => {
                     else {
                         toast.show("Something went wrong")
                     }
-                    stopLoader();
                 })
 
         } catch (error) {
@@ -189,7 +190,7 @@ const Profile = ({ navigation, route }) => {
     }
     const logout = () => {
         dispatch(getAuthSlice().logout())
-        persistor.purge()
+        navigation.navigate('/home')
         navigation.navigate('/login')
     }
 
