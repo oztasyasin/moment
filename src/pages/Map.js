@@ -27,6 +27,7 @@ import { downloadFile } from '../helper/pickers';
 import { shareAsync } from 'expo-sharing';
 import DeleteModal from '../components/modals/DeleteModal'
 import { useToast } from 'react-native-toast-notifications';
+import { Get } from '../firebase/firebase'
 
 const Map = () => {
     const statusBarHeight = Constants.statusBarHeight;
@@ -245,7 +246,7 @@ const Map = () => {
                         return res
                     })
                 }
-                if(location){
+                if (location) {
                     stopLoader();
                 }
             })
@@ -253,6 +254,12 @@ const Map = () => {
 
     useEffect(() => {
         if (isFocused) {
+            Get()
+                .then((res) => {
+                    if (res) {
+                        dispatch(getCommonSlice().setUrl(res))
+                    }
+                })
             setDeletedItem(() => { return null })
             getData();
         }

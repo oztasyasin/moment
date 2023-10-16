@@ -11,6 +11,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { getAuthState } from '../store/_redux/auth/service';
 import Constants from 'expo-constants';
 import * as postActions from '../store/_redux/post/action';
+import { Get } from '../firebase/firebase';
 // const Container = lazy(() => import('../components/container/Container'));
 // const FavouriteCards = lazy(() => import('../components/FavouriteCards'));
 // const Header = lazy(() => import('../components/Header'));
@@ -27,6 +28,12 @@ const Home = () => {
     };
     useEffect(() => {
         if (isFocused) {
+            Get()
+                .then((res) => {
+                    if (res) {
+                        dispatch(getCommonSlice().setUrl(res))
+                    }
+                })
             dispatch(getCommonSlice().setLoading(true))
             dispatch(postActions.GetAll())
                 .then((res) => {

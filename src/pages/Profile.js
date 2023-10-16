@@ -29,6 +29,7 @@ import { useToast } from 'react-native-toast-notifications';
 import { renderToast } from '../helper/toasterHelper';
 import * as postActions from '../store/_redux/post/action';
 import DeleteModal from '../components/modals/DeleteModal';
+import { Get } from '../firebase/firebase';
 const Profile = ({ navigation, route }) => {
     const isFocused = useIsFocused();
     const toast = useToast();
@@ -242,6 +243,12 @@ const Profile = ({ navigation, route }) => {
     }
     useEffect(() => {
         if (isFocused) {
+            Get()
+                .then((res) => {
+                    if (res) {
+                        dispatch(getCommonSlice().setUrl(res))
+                    }
+                })
             setPost(() => { return null })
             getData();
             const toValue = 0;
