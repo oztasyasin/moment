@@ -18,8 +18,8 @@ import { useToast } from 'react-native-toast-notifications';
 import { Get } from '../firebase/firebase';
 import { useIsFocused } from '@react-navigation/native';
 const initialValues = {
-    "mail": "oztas@yasin.com",
-    "password": "Test.123"
+    "mail": "",
+    "password": ""
 }
 const validationSchema = yup.object().shape({
     "mail": yup.string().required("Email is a required field!!!"),
