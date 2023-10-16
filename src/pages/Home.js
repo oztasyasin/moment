@@ -17,7 +17,7 @@ import { Get } from '../firebase/firebase';
 // const Header = lazy(() => import('../components/Header'));
 
 const Home = () => {
-    const [posts, setPosts] = useState(fakePosts);
+    const [posts, setPosts] = useState();
     const isFocused = useIsFocused();
 
     const dispatch = useDispatch();
@@ -35,7 +35,7 @@ const Home = () => {
                         dispatch(getCommonSlice().setUrl(res))
                     }
                     dispatch(getCommonSlice().setLoading(true))
-                    dispatch(postActions.GetAll())
+                    dispatch(postActions.GetAll(res))
                         .then((res) => {
                             if (res) {
                                 setPosts(() => {

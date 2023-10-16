@@ -4,7 +4,7 @@ import { persistReducer } from "redux-persist";
 const initialState = {
     loading: false,
     camera: false,
-    url: "https://a94c-2a02-e0-68d7-ef00-d9c-c0af-43d7-32f.ngrok-free.app"
+    url: "https://dd48-2a02-e0-68d7-ef00-d9c-c0af-43d7-32f.ngrok-free.app"
 };
 export const callTypes = {
     list: "list",

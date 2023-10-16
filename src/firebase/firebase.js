@@ -1,8 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc, getDoc, doc, updateDoc, deleteDoc, query, where } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-import { getAuthState } from "../store/_redux/auth/service";
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 const firebaseConfig = {
     apiKey: "AIzaSyCFYCFxUpGy_S5zr-GNPakdHsZMBO2r3rw",
     authDomain: "coordgraph.firebaseapp.com",
@@ -23,7 +20,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 export const Get = async () => {
     try {

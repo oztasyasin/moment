@@ -11,6 +11,7 @@ export const GetAll = () => {
             "Authorization": "Bearer " + getToken()
         },
     };
+
     return axios(config)
 }
 export const GetByUserId = (id) => {
