@@ -5,7 +5,7 @@ const baseUrl = getUrl();
 export const GetAll = () => {
     var config = {
         method: 'get',
-        url: baseUrl + "/api/post/getAll",
+        url: getUrl() + "/api/post/getAll",
         headers: {
             'Content-Type': 'application/json',
             "Authorization": "Bearer " + getToken()
@@ -17,7 +17,7 @@ export const GetAll = () => {
 export const GetByUserId = (id) => {
     var config = {
         method: 'get',
-        url: `${baseUrl}/api/post/getByUserId/${id}`,
+        url: `${getUrl()}/api/post/getByUserId/${id}`,
         headers: {
             'Content-Type': 'application/json',
             "Authorization": "Bearer " + getToken()
@@ -28,7 +28,7 @@ export const GetByUserId = (id) => {
 export const AddPost = (data) => {
     var config = {
         method: 'post',
-        url: baseUrl + "/api/post/add",
+        url: getUrl() + "/api/post/add",
         headers: {
             'Content-Type': 'multipart/form-data',
             "Authorization": "Bearer " + getToken()
@@ -41,7 +41,7 @@ export const AddPost = (data) => {
 export const DeletePost = (data) => {
     var config = {
         method: 'delete',
-        url: baseUrl + "/api/post/delete",
+        url: getUrl() + "/api/post/delete",
         headers: {
             'Content-Type': 'application/json',
             "Authorization": "Bearer " + getToken()

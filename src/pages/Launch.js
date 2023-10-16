@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { getCommonSlice } from '../store/_redux/common/service';
 import { getLocationPermission } from '../helper/permissions';
 import PermissionModal from '../components/modals/PermissionModal';
+import { Get } from '../firebase/firebase';
 const Launch = () => {
     const nativation = useNavigation();
     const authState = getAuthState();
@@ -32,36 +33,41 @@ const Launch = () => {
     useEffect(() => {
         const id = setTimeout(() => {
             if (appStateVisible == 'active') {
-                dispatch(getCommonSlice().setCamera(false))
-                dispatch(getCommonSlice().setLoading(false))
-                getLocationPermission()
-                    .then((res) => {
-                        if (res == 'granted') {
-                            if (authState.user) {
-                                nativation.navigate('/main')
+                Get().then((res) => {
+                    dispatch(getCommonSlice()
+                        .setUrl(res))
+                    dispatch(getCommonSlice().setCamera(false))
+                    dispatch(getCommonSlice().setLoading(false))
+                    getLocationPermission()
+                        .then((res) => {
+                            if (res == 'granted') {
+                                if (authState.user) {
+                                    nativation.navigate('/main')
+                                }
+                                else {
+                                    nativation.navigate('/login')
+                                }
+                                if (open) {
+                                    setOpen(() => {
+                                        return false
+                                    })
+                                }
+
+                                subscription.remove();
+                                clearTimeout(id)
                             }
                             else {
-                                nativation.navigate('/login')
+                                if (!open) {
+                                    setOpen(() => {
+                                        return true
+                                    })
+                                }
                             }
-                            if (open) {
-                                setOpen(() => {
-                                    return false
-                                })
-                            }
+                        })
+                })
 
-                            subscription.remove();
-                            clearTimeout(id)
-                        }
-                        else {
-                            if (!open) {
-                                setOpen(() => {
-                                    return true
-                                })
-                            }
-                        }
-                    })
             }
-        }, 3000);
+        }, 5000);
     }, [appStateVisible])
 
     return (
@@ -79,7 +85,7 @@ const Launch = () => {
             <PermissionModal
                 visible={open}
                 disableButton
-                close={()=>{}}
+                close={() => { }}
             />
         </Container>
     )
