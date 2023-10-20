@@ -8,6 +8,7 @@ export default function setupAxios(axios, store) {
         if (authToken) {
           config.headers.Authorization = `Bearer ${authToken}`;
         }
+        config.timeout= 6000;ƒ
         return config;
       },
       err => Promise.reject(err)

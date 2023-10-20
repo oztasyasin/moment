@@ -23,7 +23,7 @@ import { getCameraPermission } from '../helper/permissions'
 import * as postActions from '../store/_redux/post/action';
 import { useIsFocused } from '@react-navigation/native'
 import { getPureUrl, ppHelper } from '../helper/ppHelper'
-import { downloadFile } from '../helper/pickers';
+import { downloadFile, formatImage } from '../helper/pickers';
 import { shareAsync } from 'expo-sharing';
 import DeleteModal from '../components/modals/DeleteModal'
 import { useToast } from 'react-native-toast-notifications';
@@ -118,7 +118,6 @@ const Map = () => {
         switch (i) {
             case 0: openCamera(); break;
             case 1: pickImage(); break;
-            case 2: pickDocument(); break;
             default: break;
         }
     }
@@ -195,10 +194,11 @@ const Map = () => {
         setShare(() => { return null })
         try {
             const address = await addressHelper(share.latitude, share.longitude);
-
+            const formattedImage = await formatImage(data.url);
+            console.error(formatImage.uri);
             const formData = new FormData();
             formData.append("file", {
-                uri: data.url,
+                uri: formattedImage.uri,
                 type: 'image/jpeg',
                 name: 'image.jpg'
             });

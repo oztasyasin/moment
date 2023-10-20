@@ -11,11 +11,11 @@ import PostModal from '../components/modals/PostModal';
 import { useIsFocused } from '@react-navigation/native';
 import { getAuthActions, getAuthSlice, getAuthState } from '../store/_redux/auth/service';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCommonSlice } from '../store/_redux/common/service';
+import { getCommonSlice, getCommonState } from '../store/_redux/common/service';
 import EditButton from '../components/EditButton';
 import { FontAwesome } from '@expo/vector-icons';
 import ActionSheet from 'react-native-actionsheet';
-import { downloadFile, imagePicker } from '../helper/pickers';
+import { downloadFile, formatPp, imagePicker } from '../helper/pickers';
 import { CameraView } from '../components/CameraView';
 import PpModal from '../components/modals/PpModal';
 import LogoutButton from '../components/LogoutButton';
@@ -24,12 +24,15 @@ import { getCameraPermission } from '../helper/permissions';
 import PermissionModal from '../components/modals/PermissionModal';
 import { shareAsync } from 'expo-sharing';
 import uuid from 'react-native-uuid';
-import { ppHelper } from '../helper/ppHelper';
+import { getPp, ppHelper } from '../helper/ppHelper';
 import { useToast } from 'react-native-toast-notifications';
 import { renderToast } from '../helper/toasterHelper';
 import * as postActions from '../store/_redux/post/action';
 import DeleteModal from '../components/modals/DeleteModal';
 import { Get } from '../firebase/firebase';
+import axios from 'axios';
+import { isEmpty } from '../helper/isEmpty';
+import ProfileHeader from '../components/ProfileHeader';
 const Profile = ({ navigation, route }) => {
     const isFocused = useIsFocused();
     const toast = useToast();
@@ -48,6 +51,7 @@ const Profile = ({ navigation, route }) => {
     const top = useState(new Animated.Value(0))[0];
     const [y, setY] = useState(null)
     const [deletedItem, setDeletedItem] = useState(null)
+    const [friends, setFriends] = useState(null);
     const selectPost = (item) => {
         navigation.navigate('/postDetails', { post: item })
     }
@@ -68,7 +72,7 @@ const Profile = ({ navigation, route }) => {
     }
     const [posts, setPosts] = useState(null);
     const user = getAuthState().user;
-    const [pp, setPp] = useState(user?.profilePhoto);
+    const [pp, setPp] = useState(getPp(user?.id));
     console.log(pp);
     const dispatch = useDispatch();
     const getDetails = (item) => {
@@ -104,6 +108,19 @@ const Profile = ({ navigation, route }) => {
                 })
             })
     }
+    const getProfilePhoto = async () => {
+        const result = await axios.get(getPp(user?.id));
+        if (result.status === 200) {
+            setPp(() => {
+                return result.data
+            })
+        }
+        else {
+            setPp(() => {
+                return null
+            })
+        }
+    }
     const getData = () => {
         startLoader()
         dispatch(postActions.GetByUserId(user?.id))
@@ -112,7 +129,16 @@ const Profile = ({ navigation, route }) => {
                     setPosts(() => {
                         return res;
                     })
-                    stopLoader();
+                    getProfilePhoto();
+                    dispatch(getAuthActions().getFriends())
+                        .then((response) => {
+                            if (response) {
+                                setFriends(() => {
+                                    return response;
+                                })
+                            }
+                            stopLoader();
+                        })
                 }
             })
     }
@@ -162,10 +188,11 @@ const Profile = ({ navigation, route }) => {
         }
         setShare(() => { return null })
         startLoader();
+        const formattedImage = await formatPp(data.uri);
         try {
             const formData = new FormData();
             formData.append("file", {
-                uri: data.uri,
+                uri: formattedImage.uri,
                 type: 'image/jpeg',
                 name: 'image.jpg'
             });
@@ -173,14 +200,16 @@ const Profile = ({ navigation, route }) => {
             dispatch(getAuthActions()
                 .uploadProfilePhoto(formData))
                 .then((res) => {
-                    stopLoader();
                     if (res) {
-                        setPp(() => { return ppHelper(res) })
+                        setPp(() => {
+                            return `${getCommonState().url}/${res}`
+                        })
                         toast.show("Profile photo added successfuly")
                     }
                     else {
                         toast.show("Something went wrong")
                     }
+                    stopLoader();
                 })
 
         } catch (error) {
@@ -267,47 +296,14 @@ const Profile = ({ navigation, route }) => {
     return (
         <Container ignorebottom noscroll>
             <Animated.View style={{ width: fullWidth, marginTop: top }}>
-                {
-                    <Row
-                        center
-                        vertical
-                        style={globalStyles.profileFrame}>
-                        <LogoutButton press={() => logout()} />
-                        {
-                            pp ?
-                                <Image
-                                    style={globalStyles.profileImg}
-                                    source={{ uri: pp }} /> :
-                                <FontAwesome
-                                    name="user-circle"
-                                    size={100}
-                                    color="white" />
-                        }
-
-                        <Label
-                            mt={8}
-                            font={[600, 16, 18]}
-                            color={themeGrey}
-                            text={`@${user?.userName}`} />
-                        <Row mt={24} center>
-                            <ProfilePlaces
-                                title={"Posts"}
-                                content={posts ? posts?.length : 0} />
-                            {/* <ProfilePlaces
-                                left
-                                title={"Age"}
-                                content={"Not Set"} />
-                            <ProfilePlaces
-                                left
-                                title={"Location"}
-                                content={city} /> */}
-                        </Row>
-                        <EditButton press={() => edit()} />
-                    </Row>
-
-                }
-
-
+                <ProfileHeader
+                    user={user}
+                    posts={posts}
+                    city={city}
+                    friends={friends}
+                    logout={() => logout()}
+                    edit={() => edit()}
+                />
             </Animated.View>
             <ScrollView
                 onScrollBeginDrag={handleScrollBegin}
@@ -361,13 +357,16 @@ const Profile = ({ navigation, route }) => {
                         visible={deletedItem != null}
                     /> : null
             }
+            {
+                post ?
+                    <PostModal
+                        close={() => setPost(() => { return null })}
+                        post={post}
+                        share={() => shareImage()}
+                        delete={() => openDeleteModal()}
+                        visible={post != null} /> : null
+            }
 
-            <PostModal
-                close={() => setPost(() => { return null })}
-                post={post}
-                share={() => shareImage()}
-                delete={() => openDeleteModal()}
-                visible={post != null} />
             <PermissionModal
                 close={() => setPermission(() => { return null })}
                 visible={permission != null}

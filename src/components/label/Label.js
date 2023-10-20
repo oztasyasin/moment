@@ -12,6 +12,7 @@ const Label = (props) => {
             color: props.color,
             marginTop: props.mt,
             marginBottom: props.mb,
+            marginLeft: props.ml,
             ...props.style
         }}>
             {

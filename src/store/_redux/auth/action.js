@@ -9,11 +9,7 @@ export const login = (data) => dispatch => {
         .login(data)
         .then(response => {
             if (response.status == 200) {
-                const newData = {
-                    ...response.data,
-                    profilePhoto: ppHelper(response.data.profilePhoto)
-                }
-                return newData
+                return response.data
             }
             return null
         })
@@ -62,3 +58,97 @@ export const uploadProfilePhoto = (data) => dispatch => {
             return null
         })
 }
+
+
+export const getFriends = () => dispatch => {
+    dispatch(actions.startCall({ callType: callTypes.list }));
+    return requestFromServer
+        .getFriends()
+        .then(response => {
+            if (response.status == 200) {
+                return response.data
+            }
+            return null
+        })
+        .catch((err) => {
+            return null
+        })
+}
+
+
+export const getInvites = () => dispatch => {
+    dispatch(actions.startCall({ callType: callTypes.list }));
+    return requestFromServer
+        .getInvites()
+        .then(response => {
+            if (response.status == 200) {
+                return response.data
+            }
+            return null
+        })
+        .catch((err) => {
+            return null
+        })
+}
+
+
+export const acceptInvite = (id) => dispatch => {
+    dispatch(actions.startCall({ callType: callTypes.list }));
+    return requestFromServer
+        .acceptInvite(id)
+        .then(response => {
+            if (response.status == 200) {
+                return true
+            }
+            return null
+        })
+        .catch((err) => {
+            return null
+        })
+}
+
+export const declineInvite = (id) => dispatch => {
+    dispatch(actions.startCall({ callType: callTypes.list }));
+    return requestFromServer
+        .declineInvite(id)
+        .then(response => {
+            if (response.status == 200) {
+                return true
+            }
+            return null
+        })
+        .catch((err) => {
+            return null
+        })
+}
+
+export const getUsers = () => dispatch => {
+    dispatch(actions.startCall({ callType: callTypes.list }));
+    return requestFromServer
+        .getUsers()
+        .then(response => {
+            if (response.status == 200) {
+                return response.data
+            }
+            return null
+        })
+        .catch((err) => {
+            return null
+        })
+}
+
+export const sendInvite = (data) => dispatch => {
+    dispatch(actions.startCall({ callType: callTypes.list }));
+    return requestFromServer
+        .sendInvite(data)
+        .then(response => {
+            if (response.status == 200) {
+                return true
+            }
+            return null
+        })
+        .catch((err) => {
+            return null
+        })
+}
+

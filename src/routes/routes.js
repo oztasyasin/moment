@@ -1,3 +1,4 @@
+import AddUser from "../pages/AddUser";
 import Home from "../pages/Home";
 import Launch from "../pages/Launch";
 import Login from "../pages/Login";
@@ -5,6 +6,7 @@ import MainPage from "../pages/Main";
 import PostDetails from "../pages/PostDetails";
 import Register from "../pages/Register";
 import Settings from "../pages/Settings";
+import User from "../pages/User";
 
 export const routes = [
     {
@@ -35,6 +37,18 @@ export const routes = [
     {
         path: '/settings',
         component: Settings,
+        permission: "anyallow"
+    },
+
+    {
+        path: '/user',
+        component: User,
+        permission: "anyallow"
+    },
+
+    {
+        path: '/addUser',
+        component: AddUser,
         permission: "anyallow"
     },
 ]

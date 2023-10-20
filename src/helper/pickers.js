@@ -1,7 +1,7 @@
-import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
 import { imageName } from '../data/staticDatas';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
 
 export const imagePicker = async () => {
@@ -48,5 +48,32 @@ export const downloadFile = async (uri, name) => {
         return result
     } catch (error) {
         return null
+    }
+}
+
+export const formatImage = async (uri) => {
+    try {
+        const manipResult = await ImageManipulator.manipulateAsync(
+            uri,
+            [{ resize: { width: 500, height: 500 } }],
+            { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+        );
+        return manipResult
+    } catch (error) {
+        return uri
+    }
+}
+
+export const formatPp = async (uri) => {
+    try {
+        const manipResult = await ImageManipulator.manipulateAsync(
+            uri,
+            [{ resize: { width: 300, height: 300 } }],
+            { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG }
+        );
+        return manipResult
+    } catch (error) {
+        return uri
+
     }
 }

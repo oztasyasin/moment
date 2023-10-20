@@ -1,14 +1,13 @@
 import React from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { globalStyles } from '../styles/globalStyles';
-import { TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 const EditButton = (props) => {
     return (
-        <TouchableOpacity
-            onPress={() => props.press()}
+        <View
             style={globalStyles.settingsButton}>
-            <MaterialIcons name="edit" size={24} color="white" />
-        </TouchableOpacity>
+            <MaterialIcons name="edit" size={20} color="white" />
+        </View>
     )
 }
 

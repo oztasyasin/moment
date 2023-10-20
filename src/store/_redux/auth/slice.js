@@ -6,6 +6,7 @@ const initialState = {
     token: null,
     location: null,
     address: null,
+    notifications: null,
 };
 export const callTypes = {
     list: "list",
@@ -47,6 +48,9 @@ export const Slice = createSlice({
         },
         setAddress: (state, action) => {
             state.address = action.payload;
+        },
+        setNotifications: (state, action) => {
+            state.notifications = action.payload;
         },
         logout: (state) => {
             state.address = null;

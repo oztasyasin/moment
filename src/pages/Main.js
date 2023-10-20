@@ -7,10 +7,21 @@ import { Ionicons } from '@expo/vector-icons'
 import { navBarHeight, themeGrey } from '../data/staticDatas';
 import { useSelector } from 'react-redux';
 import { createStackNavigator } from "@react-navigation/stack";
+import Notifications from './Notifications';
+import { Text, View } from 'react-native';
+import { globalStyles } from '../styles/globalStyles';
+import { isEmpty } from '../helper/isEmpty';
+import { ListenHub } from '../hub/ListenHubService';
 
 const Tab = createBottomTabNavigator();
 const MainPage = () => {
     const camera = useSelector((state) => state.common.camera);
+    const notifications = useSelector((state) => state.auth.notifications);
+    const count = notifications?.length;
+    useEffect(() => {
+        ListenHub();
+    }, [])
+    
     return (
         <>
 
@@ -35,10 +46,27 @@ const MainPage = () => {
                                 <Ionicons name="map" style={{ color: focused ? "white" : themeGrey }} size={30} color={focused ? "#1e90ff" : "gray"}></Ionicons>
                             );
                         }
+                        else if (route.name === '/notifications') {
+                            return (
+                                <View>
+                                    {
+                                        !isEmpty(notifications) ?
+                                            <View style={globalStyles.notificationCount}>
+                                                <Text style={globalStyles.countText}>
+                                                    {count}
+                                                </Text>
+                                            </View> : null
+                                    }
+                                    <Ionicons name="ios-notifications-sharp" style={{ color: focused ? "white" : themeGrey }} size={30} color={focused ? "#1e90ff" : "gray"}></Ionicons>
+                                </View>
+
+                            );
+                        }
                         else if (route.name === '/profile') {
                             return (
                                 <Ionicons name="person-circle" style={{ color: focused ? "white" : themeGrey }} size={30} color={focused ? "#1e90ff" : "gray"}></Ionicons>
                             );
+
                         }
                     },
                     headerShown: false,
@@ -47,6 +75,7 @@ const MainPage = () => {
                 })}>
                 <Tab.Screen name="/home" component={Home} />
                 <Tab.Screen name="/map" component={Map} />
+                <Tab.Screen name="/notifications" component={Notifications} />
                 <Tab.Screen name="/profile" component={Profile} />
             </Tab.Navigator>
         </>

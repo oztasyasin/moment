@@ -32,7 +32,7 @@ const DeleteModal = (props) => {
                 style={{ maxWidth: '70%', marginHorizontal: 32, textAlign: 'center',margin:12 }}
                 text={"Are you sure you want to permanently delete the selected data?"} />
             <Button
-                style={{ maxWidth: getAdaptedWidth(280), minWidth: getAdaptedWidth(280) }}
+                style={{ maxWidth: '80%', minWidth: '80%', marginHorizontal:32}}
                 text={"Delete"}
                 mb={16}
                 mt={16}

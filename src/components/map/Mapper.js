@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { fullWidth, themeGrey } from '../../data/staticDatas';
 import { getAdaptedWidth } from '../../helper/sizeAdapter';
@@ -18,11 +18,6 @@ const Mapper = (props) => {
     const isLoading = useSelector((state) => state.common.loading);
     const [points, setPoints] = useState(props.locations);
     const dispatch = useDispatch();
-    const handleMapPress = (event) => {
-        if (!props.requestPage) {
-            const { coordinate } = event.nativeEvent;
-        }
-    };
     const getLocationAsync = () => {
         getCurrentPosition()
             .then((location) => {
@@ -44,9 +39,27 @@ const Mapper = (props) => {
                 dispatch(getCommonSlice().setLoading(false));
             })
     };
+    const handleMapPress = (event) => {
+        const { coordinate } = event.nativeEvent;
+        props.changeLocation({
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude
+        })
+
+        setRegion(() => {
+            return {
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude,
+                latitudeDelta: 10,
+                longitudeDelta: 10,
+            }
+        });
+    };
     useEffect(() => {
         if (!props.location) {
-            dispatch(getCommonSlice().setLoading(true));
+            if(Platform.OS == 'ios'){
+                dispatch(getCommonSlice().setLoading(true));
+            }
             getLocationPermission()
                 .then((res) => {
                     if (res) {

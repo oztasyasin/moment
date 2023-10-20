@@ -1,17 +1,17 @@
 import axios from 'axios';
 import { getUrl } from '../../../helper/urlHelper';
 import { getToken } from '../../../helper/tokenHelper';
+import { getAuthState } from '../auth/service';
 const baseUrl = getUrl();
 export const GetAll = () => {
     var config = {
         method: 'get',
-        url: getUrl() + "/api/post/getAll",
+        url: `${getUrl()}/api/post/getFriendsPosts/${getAuthState().user.id}`,
         headers: {
             'Content-Type': 'application/json',
             "Authorization": "Bearer " + getToken()
         },
     };
-
     return axios(config)
 }
 export const GetByUserId = (id) => {
@@ -41,12 +41,11 @@ export const AddPost = (data) => {
 export const DeletePost = (data) => {
     var config = {
         method: 'delete',
-        url: getUrl() + "/api/post/delete",
+        url: getUrl() + "/api/post/delete/" + data.Id,
         headers: {
             'Content-Type': 'application/json',
             "Authorization": "Bearer " + getToken()
         },
-        data: data
     };
     return axios(config)
 }

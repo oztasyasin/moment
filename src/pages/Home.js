@@ -12,6 +12,8 @@ import { getAuthState } from '../store/_redux/auth/service';
 import Constants from 'expo-constants';
 import * as postActions from '../store/_redux/post/action';
 import { Get } from '../firebase/firebase';
+import { isEmpty } from '../helper/isEmpty';
+import EmptyData from '../components/EmptyData';
 // const Container = lazy(() => import('../components/container/Container'));
 // const FavouriteCards = lazy(() => import('../components/FavouriteCards'));
 // const Header = lazy(() => import('../components/Header'));
@@ -29,6 +31,7 @@ const Home = () => {
     useEffect(() => {
         if (isFocused) {
             dispatch(getCommonSlice().setLoading(true))
+            setPosts(() => { return null })
             dispatch(postActions.GetAll())
                 .then((res) => {
                     if (res) {
@@ -45,12 +48,17 @@ const Home = () => {
     return (
         <Container noscroll ignorebottom >
             <Header />
-            <FlatList
-                style={{ minWidth: fullWidth, flex: 1, marginBottom: Platform.OS == 'android' ? 40 + Constants.statusBarHeight : 80 + Constants.statusBarHeight }}
-                data={posts}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-            />
+            {
+                isEmpty(posts) ?
+                    <EmptyData /> :
+                    <FlatList
+                        style={{ minWidth: fullWidth, flex: 1, marginBottom: Platform.OS == 'android' ? 40 + Constants.statusBarHeight : 80 + Constants.statusBarHeight }}
+                        data={posts}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item.id}
+                    />
+            }
+
         </Container>
     )
 }

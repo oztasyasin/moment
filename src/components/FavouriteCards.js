@@ -1,4 +1,4 @@
-import React, { useEffect,memo } from 'react'
+import React, { useEffect, memo, useState } from 'react'
 import { View, Image, TouchableOpacity } from 'react-native'
 import { globalStyles } from '../styles/globalStyles'
 import { themeGrey, themeRed } from '../data/staticDatas'
@@ -9,18 +9,29 @@ import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Logo from './svg/Logo';
-import { ppHelper } from '../helper/ppHelper';
+import { getPp, ppHelper } from '../helper/ppHelper';
 import { isEmpty } from '../helper/isEmpty';
+import axios from 'axios';
 const FavouriteCards = (props) => {
     const navigation = useNavigation();
     const { post, now } = props;
     const today = new Date();
     const postDate = new Date(post.date);
     const zamanFarki = dateDistance(today, postDate);
+    const [pp, setPp] = useState(null);
     const goProfile = () => {
 
     }
     useEffect(() => {
+        axios.get(getPp(post.userId))
+            .then((res) => {
+                if (!res.data) {
+                    setPp(() => { return null })
+                }
+                else{
+                    setPp(() => { return "dasdsa" })
+                }
+            })
 
     }, [])
 
@@ -34,10 +45,10 @@ const FavouriteCards = (props) => {
                     !now ?
                         <TouchableOpacity onPress={() => goProfile()} style={globalStyles.postProfile}>
                             {
-                                !isEmpty(post.profilePhotoURL) ?
+                                !isEmpty(pp) ?
                                     <Image
                                         style={globalStyles.favouritePp}
-                                        source={{ uri: ppHelper(post.profilePhotoURL) }} /> :
+                                        source={{ uri: getPp(post.userId) }} /> :
                                     <FontAwesome
                                         name="user-circle"
                                         size={40}

@@ -13,3 +13,8 @@ export const ppHelper = (pp) => {
 export const getPureUrl = (url) => {
     return `api${url?.split('api')[1]}`;
 }
+
+export const getPp = (id) => {
+    const url = `${getCommonState().url}/api/auth/getPp/${id}`
+    return url
+}

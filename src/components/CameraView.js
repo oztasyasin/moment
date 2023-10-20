@@ -89,7 +89,7 @@ export function CameraView(props) {
                                 </TouchableOpacity>
                             </View>
                             <Camera
-                                style={{ minWidth: fullWidth, aspectRatio: 1, maxHeight: fullWidth, minHeight: fullWidth, height: fullWidth }}
+                                style={{ height: fullWidth, aspectRatio: 1}}
                                 type={type}
                                 ref={cameraRef}
                             />
