@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Profile from './Profile';
 import Home from './Home';
@@ -8,20 +8,24 @@ import { navBarHeight, themeGrey } from '../data/staticDatas';
 import { useSelector } from 'react-redux';
 import { createStackNavigator } from "@react-navigation/stack";
 import Notifications from './Notifications';
-import { Text, View } from 'react-native';
+import { DeviceEventEmitter, Text, View } from 'react-native';
 import { globalStyles } from '../styles/globalStyles';
 import { isEmpty } from '../helper/isEmpty';
 import { ListenHub } from '../hub/ListenHubService';
 
 const Tab = createBottomTabNavigator();
-const MainPage = () => {
+const MainPage = ({ route }) => {
     const camera = useSelector((state) => state.common.camera);
-    const notifications = useSelector((state) => state.auth.notifications);
-    const count = notifications?.length;
+    const [show, setShow] = useState(false);
     useEffect(() => {
         ListenHub();
+        DeviceEventEmitter.addListener("notifications", (value) => {
+            setShow(() => {
+                return value;
+            })
+        })
     }, [])
-    
+
     return (
         <>
 
@@ -50,12 +54,8 @@ const MainPage = () => {
                             return (
                                 <View>
                                     {
-                                        !isEmpty(notifications) ?
-                                            <View style={globalStyles.notificationCount}>
-                                                <Text style={globalStyles.countText}>
-                                                    {count}
-                                                </Text>
-                                            </View> : null
+                                        show ?
+                                            <View style={globalStyles.notificationCount} /> : null
                                     }
                                     <Ionicons name="ios-notifications-sharp" style={{ color: focused ? "white" : themeGrey }} size={30} color={focused ? "#1e90ff" : "gray"}></Ionicons>
                                 </View>

@@ -17,7 +17,7 @@ import EmptyData from '../components/EmptyData';
 import PostModal from '../components/modals/PostModal';
 import BackButton from '../components/BackButton';
 const User = ({ route }) => {
-    const user = route?.params?.user;
+    const user =  route?.params?.user;
     const [posts, setPosts] = useState(null);
     const dispatch = useDispatch();
     const [hide, setHide] = useState(false);

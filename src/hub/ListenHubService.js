@@ -1,10 +1,14 @@
 import { DeviceEventEmitter } from "react-native";
 import { HubConnection } from "./HubClient";
+import store from "../store/Store";
 export const ListenHub = () => {
     const webSocket = HubConnection();
-    webSocket.on("ReceieveFriendRequest", (msg) => {
+    webSocket.on("ReceiveFriendRequest", (msg) => {
         var data = JSON.stringify(msg);
-        console.error(data);
-        DeviceEventEmitter.emit("notifications", data)
+        data = data.replace(`"`,'');
+        data = data.replace(`"`,'');
+        if (data.toString() == store.getState()?.auth?.user?.id.toString()) {
+            DeviceEventEmitter.emit("notifications", true)
+        }
     });
 }

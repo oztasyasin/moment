@@ -36,7 +36,6 @@ const Mapper = (props) => {
                         }
                     })
                 }
-                dispatch(getCommonSlice().setLoading(false));
             })
     };
     const handleMapPress = (event) => {
@@ -57,9 +56,6 @@ const Mapper = (props) => {
     };
     useEffect(() => {
         if (!props.location) {
-            if(Platform.OS == 'ios'){
-                dispatch(getCommonSlice().setLoading(true));
-            }
             getLocationPermission()
                 .then((res) => {
                     if (res) {

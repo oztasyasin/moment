@@ -1,10 +1,10 @@
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import { getCommonState } from '../store/_redux/common/service';
-const url = getCommonState().url + "/friendRequestHub";
 
 export const HubConnection = () => {
+    const url = getCommonState().url + "/friendRequestHub";
     const connection = new HubConnectionBuilder()
-        .withUrl(url)
+        .withUrl(getCommonState().url + "/friendRequestHub")
         .configureLogging(LogLevel.Information)
         .build();
 

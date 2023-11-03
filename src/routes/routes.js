@@ -1,4 +1,5 @@
 import AddUser from "../pages/AddUser";
+import Friends from "../pages/Friends";
 import Home from "../pages/Home";
 import Launch from "../pages/Launch";
 import Login from "../pages/Login";
@@ -39,16 +40,19 @@ export const routes = [
         component: Settings,
         permission: "anyallow"
     },
-
     {
         path: '/user',
         component: User,
         permission: "anyallow"
     },
-
     {
         path: '/addUser',
         component: AddUser,
+        permission: "anyallow"
+    },
+    {
+        path: '/friends',
+        component: Friends,
         permission: "anyallow"
     },
 ]

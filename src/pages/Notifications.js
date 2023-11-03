@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Container from '../components/container/Container'
-import { Text } from 'react-native'
+import { DeviceEventEmitter, Text } from 'react-native'
 import Header from '../components/Header'
 import EmptyData from '../components/EmptyData'
 import { useDispatch, useSelector } from 'react-redux'
@@ -8,13 +8,21 @@ import { getAuthActions, getAuthSlice } from '../store/_redux/auth/service'
 import { isEmpty } from '../helper/isEmpty'
 import { useIsFocused } from '@react-navigation/native'
 import NotificationRow from '../components/NotificationRow'
+import { getCommonSlice } from '../store/_redux/common/service'
 
 const Notifications = ({ navigation }) => {
+    DeviceEventEmitter.emit("notifications", false)
     const [invites, setInvites] = useState(null);
     const isFocused = useIsFocused();
     const dispatch = useDispatch();
-    const notifications = useSelector((state) => state.auth.notifications);
+    const startLoader = () => {
+        dispatch(getCommonSlice().setLoading(true))
+    }
+    const stopLoader = () => {
+        dispatch(getCommonSlice().setLoading(false))
+    }
     const getData = () => {
+        startLoader();
         dispatch(getAuthActions().getInvites())
             .then((res) => {
                 if (res) {
@@ -22,6 +30,7 @@ const Notifications = ({ navigation }) => {
                     setInvites(() => {
                         return res
                     })
+                    stopLoader();
                 }
             })
     }

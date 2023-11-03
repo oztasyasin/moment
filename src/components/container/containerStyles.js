@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 export const containerStyles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: themeDark,
+        backgroundColor:'white',
     },
     scroll: {
         minWidth: '100%',
@@ -16,6 +16,5 @@ export const containerStyles = StyleSheet.create({
         paddingHorizontal: 16,
         width: '100%',
         minHeight: Dimensions.get('window').height,
-        backgroundColor:'white'
     }
 })

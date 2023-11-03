@@ -41,7 +41,7 @@ export const AddPost = (data) => {
 export const DeletePost = (data) => {
     var config = {
         method: 'delete',
-        url: getUrl() + "/api/post/delete/" + data.Id,
+        url: getUrl() + "/api/post/delete/" + data.id,
         headers: {
             'Content-Type': 'application/json',
             "Authorization": "Bearer " + getToken()

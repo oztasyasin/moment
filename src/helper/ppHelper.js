@@ -15,6 +15,6 @@ export const getPureUrl = (url) => {
 }
 
 export const getPp = (id) => {
-    const url = `${getCommonState().url}/api/auth/getPp/${id}`
+    const url = `${getCommonState().url}/api/auth/get/${id}/profilePhoto/${id}.jpg`;
     return url
 }

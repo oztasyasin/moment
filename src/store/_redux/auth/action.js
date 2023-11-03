@@ -25,12 +25,8 @@ export const register = (data) => dispatch => {
         .then(response => {
             if (response.status == 200) {
                 const newData = {
-                    data: {
-                        ...response.data,
-                        profilePhoto: ppHelper(response.data.profilePhoto)
-                    },
+                    ...response.data,
                     success: true
-
                 }
                 return newData
             }
@@ -151,4 +147,21 @@ export const sendInvite = (data) => dispatch => {
             return null
         })
 }
+
+export const deleteFriendship = (id) => dispatch => {
+    dispatch(actions.startCall({ callType: callTypes.list }));
+    return requestFromServer
+        .deleteFriendship(id)
+        .then(response => {
+            if (response.status == 200) {
+                return true
+            }
+            return null
+        })
+        .catch((err) => {
+            return null
+        })
+}
+
+
 

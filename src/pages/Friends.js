@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Container from '../components/container/Container'
 import Header from '../components/Header'
-import { FlatList, Text } from 'react-native'
-import { isEmpty } from '../helper/isEmpty'
-import EmptyData from '../components/EmptyData'
 import { useIsFocused } from '@react-navigation/native'
 import { useDispatch } from 'react-redux'
-import { getAuthActions, getAuthState } from '../store/_redux/auth/service'
-import UserRow from '../components/UserRow'
-import { fullWidth, statusBarHeight } from '../data/staticDatas'
-import { useToast } from 'react-native-toast-notifications'
+import { getAuthActions } from '../store/_redux/auth/service'
 import { getCommonSlice } from '../store/_redux/common/service'
+import { isEmpty } from '../helper/isEmpty'
+import EmptyData from '../components/EmptyData'
+import { FlatList } from 'react-native'
+import { fullWidth, statusBarHeight } from '../data/staticDatas'
+import UserRow from '../components/UserRow'
+import { useToast } from 'react-native-toast-notifications'
 
-const AddUser = ({ navigation }) => {
-    const [users, setUsers] = useState(null);
+const Friends = ({ navigation }) => {
     const isFocused = useIsFocused();
+    const [friends, setFriends] = useState(null);
     const dispatch = useDispatch();
     const toast = useToast();
+    const [isRefreshing, setRefreshing] = useState(false);
     const startLoader = () => {
         dispatch(getCommonSlice().setLoading(true));
     }
@@ -25,35 +26,35 @@ const AddUser = ({ navigation }) => {
     }
     const getData = () => {
         startLoader();
-        dispatch(getAuthActions().getUsers())
+        dispatch(getAuthActions().getFriends())
             .then((res) => {
                 if (res) {
-                    setUsers(() => {
+                    setFriends(() => {
                         return res
                     })
-                    stopLoader();
                 }
+                setRefreshing(() => { return false });
+                stopLoader();
             })
     }
-    const sendInvite = (item) => {
-        startLoader();
-        dispatch(getAuthActions().sendInvite({
-            userId: getAuthState().user.id,
-            friendId: item.id
-        }))
+    const refresh = () => {
+        setRefreshing(() => { return true });
+        getData();
+    }
+    const profilePress = (item) => {
+        navigation.navigate('/user', { user: { user: item } });
+    }
+    const deleteFriend = (item) => {
+        dispatch(getAuthActions().deleteFriendship(item.id))
             .then((res) => {
                 if (res) {
                     getData();
-                    toast.show("Friend request sent successfully")
+                    toast.show("Unfriending process completed successfully")
                 }
                 else {
-                    toast.show("something went wrong")
+                    toast.show("Something went wrong")
                 }
             })
-        stopLoader();
-    }
-    const profilePress = (item) => {
-        navigation.navigate('/user', { user: item });
     }
     useEffect(() => {
         if (isFocused) {
@@ -65,27 +66,27 @@ const AddUser = ({ navigation }) => {
         <Container noscroll>
             <Header hasBackButton />
             {
-                isEmpty(users) ?
+                isEmpty(friends) ?
                     <EmptyData /> :
                     <FlatList
                         refreshing={false}
-                        onRefresh={() => getData()}
+                        onRefresh={() => refresh()}
                         style={{ width: fullWidth, maxWidth: fullWidth, marginBottom: statusBarHeight }}
-                        data={users}
+                        data={friends}
                         renderItem={({ item }) => {
                             return (
                                 <UserRow
-                                    profilePress={() => { }}
-                                    sendInvite={() => sendInvite(item)}
+                                    friend
+                                    profilePress={() => profilePress(item)}
+                                    deleteFriend={() => deleteFriend(item)}
                                     user={item} />
                             )
                         }}
                         keyExtractor={item => item.id}
                     />
             }
-
         </Container>
     )
 }
 
-export default AddUser
+export default Friends

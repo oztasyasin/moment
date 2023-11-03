@@ -41,6 +41,7 @@ const Profile = ({ navigation, route }) => {
     const optionArray = ["Use Camera", "From Galery", "Cancel"];
     const [post, setPost] = useState(null);
     const [image, setImage] = useState(null);
+    const [trigger, setTrigger] = useState(false);
     const [share, setShare] = useState(null);
     const [hide, setHide] = useState(false);
     const camera = useSelector((state) => state.common.camera);
@@ -72,8 +73,6 @@ const Profile = ({ navigation, route }) => {
     }
     const [posts, setPosts] = useState(null);
     const user = getAuthState().user;
-    const [pp, setPp] = useState(getPp(user?.id));
-    console.log(pp);
     const dispatch = useDispatch();
     const getDetails = (item) => {
         setPost(() => {
@@ -91,7 +90,7 @@ const Profile = ({ navigation, route }) => {
     }
     const deletePost = () => {
         startLoader()
-        dispatch(postActions.DeletePost({ Id: deletedItem.id }))
+        dispatch(postActions.DeletePost({ id: deletedItem.id }))
             .then((res) => {
                 setPost(() => { return null })
                 if (res) {
@@ -108,19 +107,7 @@ const Profile = ({ navigation, route }) => {
                 })
             })
     }
-    const getProfilePhoto = async () => {
-        const result = await axios.get(getPp(user?.id));
-        if (result.status === 200) {
-            setPp(() => {
-                return result.data
-            })
-        }
-        else {
-            setPp(() => {
-                return null
-            })
-        }
-    }
+
     const getData = () => {
         startLoader()
         dispatch(postActions.GetByUserId(user?.id))
@@ -129,7 +116,6 @@ const Profile = ({ navigation, route }) => {
                     setPosts(() => {
                         return res;
                     })
-                    getProfilePhoto();
                     dispatch(getAuthActions().getFriends())
                         .then((response) => {
                             if (response) {
@@ -137,9 +123,9 @@ const Profile = ({ navigation, route }) => {
                                     return response;
                                 })
                             }
-                            stopLoader();
                         })
                 }
+                stopLoader();
             })
     }
 
@@ -201,14 +187,14 @@ const Profile = ({ navigation, route }) => {
                 .uploadProfilePhoto(formData))
                 .then((res) => {
                     if (res) {
-                        setPp(() => {
-                            return `${getCommonState().url}/${res}`
-                        })
                         toast.show("Profile photo added successfuly")
                     }
                     else {
                         toast.show("Something went wrong")
                     }
+                    setTrigger((current) => {
+                        return !current
+                    })
                     stopLoader();
                 })
 
@@ -219,7 +205,6 @@ const Profile = ({ navigation, route }) => {
     }
     const logout = () => {
         dispatch(getAuthSlice().logout())
-        navigation.navigate('/home')
         navigation.navigate('/login')
     }
 
@@ -295,15 +280,20 @@ const Profile = ({ navigation, route }) => {
 
     return (
         <Container ignorebottom noscroll>
-            <Animated.View style={{ width: fullWidth, marginTop: top }}>
-                <ProfileHeader
-                    user={user}
-                    posts={posts}
-                    city={city}
-                    friends={friends}
-                    logout={() => logout()}
-                    edit={() => edit()}
-                />
+            <Animated.View style={{ width: fullWidth, marginTop: top, minHeight: 296, backgroundColor: 'black' }}>
+                {
+                    !hide ?
+                        < ProfileHeader
+                            trigger={trigger}
+                            user={user}
+                            posts={posts}
+                            city={city}
+                            friends={friends}
+                            logout={() => logout()}
+                            edit={() => edit()}
+                        /> : null
+                }
+
             </Animated.View>
             <ScrollView
                 onScrollBeginDrag={handleScrollBegin}

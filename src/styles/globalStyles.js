@@ -80,7 +80,7 @@ export const globalStyles = StyleSheet.create({
         backgroundColor: 'white',
     },
     favouriteImg: {
-        width: '100%',
+        width: fullWidth,
         aspectRatio: 1,
     },
     favouritePp: {
@@ -105,6 +105,18 @@ export const globalStyles = StyleSheet.create({
         position: 'absolute',
         bottom: 16,
         right: 16
+    },
+    refreshButton: {
+        padding:5,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent:'center',
+        borderRadius: 12,
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        position: 'absolute',
+        top: 16,
+        left: 16,
+        zIndex:9
     },
     cameraViewFrame: {
         minWidth: fullWidth,
@@ -197,13 +209,13 @@ export const globalStyles = StyleSheet.create({
     },
     notificationCount: {
         backgroundColor: themeRed,
-        height: 28,
-        width: 28,
+        height: 10,
+        width: 10,
         position: 'absolute',
         zIndex: 0,
         borderRadius: 14,
-        top: -10,
-        right: -10,
+        top: 0,
+        right: 0,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -219,10 +231,10 @@ export const globalStyles = StyleSheet.create({
         top: 16,
         left: 16
     },
-    addUsersButton:{
-        position:'absolute',
+    addUsersButton: {
+        position: 'absolute',
         top: 32,
-        right:32
+        right: 32
     }
 
 })

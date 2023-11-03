@@ -28,6 +28,7 @@ import { shareAsync } from 'expo-sharing';
 import DeleteModal from '../components/modals/DeleteModal'
 import { useToast } from 'react-native-toast-notifications';
 import { Get } from '../firebase/firebase'
+import RefreshButton from '../components/RefreshButton'
 
 const Map = () => {
     const statusBarHeight = Constants.statusBarHeight;
@@ -55,12 +56,9 @@ const Map = () => {
     }
     const dispatch = useDispatch();
     const getDetails = (item) => {
-        addressHelper(location.latitude, location.longitude)
-            .then((res) => {
-                setPost(() => {
-                    return { ...item, address: res }
-                })
-            })
+        setPost(() => {
+            return item
+        })
     }
     const changeLocation = (location) => {
         setLocation(() => { return location });
@@ -170,7 +168,6 @@ const Map = () => {
 
     }
     const deletePost = () => {
-        startLoader();
         dispatch(postActions.DeletePost({ id: deletedItem.id }))
             .then((res) => {
                 if (res) {
@@ -185,7 +182,6 @@ const Map = () => {
             })
     }
     const sharePost = async () => {
-        startLoader();
         const data = {
             ...share,
             address: address,
@@ -195,7 +191,6 @@ const Map = () => {
         try {
             const address = await addressHelper(share.latitude, share.longitude);
             const formattedImage = await formatImage(data.url);
-            console.error(formatImage.uri);
             const formData = new FormData();
             formData.append("file", {
                 uri: formattedImage.uri,
@@ -228,10 +223,8 @@ const Map = () => {
     const shareImage = () => {
         const data = { ...post };
         setPost(() => { return null })
-        startLoader();
         downloadFile(ppHelper(data.photoUrl), uuid.v4())
             .then((res) => {
-                stopLoader();
                 if (res?.status === 200) {
                     shareAsync(res.uri)
                 }
@@ -246,15 +239,12 @@ const Map = () => {
                         return res
                     })
                 }
-                if (location) {
-                    stopLoader();
-                }
+                stopLoader();
             })
     }
 
     useEffect(() => {
         if (isFocused) {
-            stopLoader();
             Get()
                 .then((res) => {
                     if (res) {
@@ -270,6 +260,7 @@ const Map = () => {
         <Container noscroll ignorebottom>
             <Header />
             <View style={{ maxHeight: useableScreenSize }}>
+                <RefreshButton press={() => getData()} />
                 <Mapper
                     getDetails={(item) => getDetails(item)}
                     locations={posts}

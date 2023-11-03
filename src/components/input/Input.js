@@ -21,7 +21,7 @@ const Input = (props) => {
                 secureTextEntry={props.hide}
                 placeholder={props.placeholder}
                 value={props.value}
-                onChangeText={(e) => props.change(e)}
+                onChangeText={(e) => props.change(props.hide ? e : e.toLowerCase())}
                 style={inputStyles.input} />
         </View>
     )

@@ -16,11 +16,11 @@ const EmptyData = () => {
                     size={70}
                     color="black" />
                 <Label
-                    mt={24}
-                    text={"No Data!!"}
-                    font={[600, 24, 22]} />
-                <Label
                     mt={16}
+                    text={"No Data!!"}
+                    font={[600, 24, 26]} />
+                <Label
+                    mt={12}
                     style={{maxWidth:'55%',textAlign:'center'}}
                     text={"There seems to be no data here. Please try again later"}
                     font={[400, 16, 20]} />

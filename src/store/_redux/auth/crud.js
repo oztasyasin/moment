@@ -111,3 +111,15 @@ export const sendInvite = (data) => {
     };
     return axios(config)
 }
+
+export const deleteFriendship = (id) => {
+    var config = {
+        method: 'delete',
+        url: `${getUrl()}/api/auth/deleteFriendship/${store.getState().auth.user.id}/${id}`,
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Bearer " + getToken()
+        },
+    };
+    return axios(config)
+}

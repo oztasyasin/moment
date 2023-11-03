@@ -38,7 +38,7 @@ const FavouriteCards = (props) => {
     return (
         <View style={{
             ...globalStyles.favouriteFrame,
-            paddingBottom: props.nopadding ? 0 : 32
+           
         }}>
             <Row split style={{ paddingHorizontal: 16 }}>
                 {

@@ -3,13 +3,13 @@ export const GetAll = () => dispatch => {
     return requestFromServer
         .GetAll()
         .then(response => {
-            if (response.status == 200) {
+            if (response.status === 200) {
                 return response.data
             }
             return null
         })
         .catch((err) => {
-            return null
+            return err.response.status
         })
 }
 export const GetByUserId = (id) => dispatch => {

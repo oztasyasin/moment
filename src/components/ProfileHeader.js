@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import Row from './row/Row'
 import LogoutButton from './LogoutButton'
 import Label from './label/Label'
@@ -21,20 +21,21 @@ const ProfileHeader = (props) => {
             vertical
             style={globalStyles.profileFrame}>
             <LogoutButton press={() => props.logout()} />
-            {
-                !isEmpty(user?.profilePhoto) ?
-                    <TouchableOpacity onPress={() => props.edit()}>
+
+            <TouchableOpacity onPress={() => props.edit()}>
+                {
+                    !isEmpty(user?.profilePhoto) ?
                         <Image
                             style={globalStyles.profileImg}
-                            source={{ uri: getPp(user?.id) }} />
-                        <EditButton press={() => props.edit()} />
-                    </TouchableOpacity>
-                    :
-                    <FontAwesome
-                        name="user-circle"
-                        size={100}
-                        color="white" />
-            }
+                            source={{ uri: getPp(user?.id) }} /> :
+                        <FontAwesome
+                            name="user-circle"
+                            size={100}
+                            color="white" />
+                }
+                <EditButton press={() => props.edit()} />
+            </TouchableOpacity>
+
             <Label
                 mt={8}
                 font={[600, 16, 18]}
@@ -42,19 +43,23 @@ const ProfileHeader = (props) => {
                 text={`@${user?.userName}`} />
             <Row mt={24} style={{ maxWidth: 390 }} center>
                 <ProfilePlaces
+                    disabled
+                    press={() => { }}
                     title={"Posts"}
                     content={posts ? posts?.length : 0} />
                 <ProfilePlaces
                     left
+                    press={() => navigation.navigate('/friends')}
                     title={"Friends"}
                     content={friends ? friends?.length : 0} />
                 <ProfilePlaces
                     left
+                    press={() => navigation.navigate('/map')}
                     title={"Location"}
                     content={city} />
             </Row>
-            <TouchableOpacity 
-                onPress={()=>navigation.navigate('/addUser')}
+            <TouchableOpacity
+                onPress={() => navigation.navigate('/addUser')}
                 style={globalStyles.addUsersButton}>
                 <AntDesign name="addusergroup" size={28} color="white" />
             </TouchableOpacity>

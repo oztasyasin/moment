@@ -4,7 +4,7 @@ import { globalStyles } from '../styles/globalStyles';
 import { getPp } from '../helper/ppHelper';
 import Label from './label/Label';
 import { themeGreen, themeGrey, themeRed } from '../data/staticDatas';
-import { AntDesign, FontAwesome } from '@expo/vector-icons';
+import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { isEmpty } from '../helper/isEmpty';
 const UserRow = (props) => {
     const { user } = props;
@@ -29,9 +29,16 @@ const UserRow = (props) => {
                         text={`@${user.userName}`} />
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => props.sendInvite()}>
-                <AntDesign name="adduser" size={24} color="black" />
-            </TouchableOpacity>
+            {
+                !props.friend ?
+                    <TouchableOpacity onPress={() => props.sendInvite()}>
+                        <AntDesign name="adduser" size={24} color="black" />
+                    </TouchableOpacity> :
+                    <TouchableOpacity onPress={() => props.deleteFriend()}>
+                        <Ionicons name={"trash"} color={themeRed} size={24} />
+                    </TouchableOpacity>
+
+            }
         </View>
     )
 }

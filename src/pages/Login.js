@@ -58,6 +58,7 @@ const Login = ({ navigation }) => {
     }
     useEffect(() => {
         if (isFocused) {
+            dispatch(getAuthSlice().logout());
             dispatch(getCommonSlice().setLoading(false))
             Get()
                 .then((res) => {
