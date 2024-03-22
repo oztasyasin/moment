@@ -1,8 +1,8 @@
 import * as DocumentPicker from 'expo-document-picker';
 import { imageName } from '../data/staticDatas';
-import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
+import * as ImagePicker from 'expo-image-picker';
 
 export const imagePicker = async () => {
     try {

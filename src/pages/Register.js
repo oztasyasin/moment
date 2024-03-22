@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import { Formik } from 'formik';
 import ErrorLines from '../components/ErrorLines';
 import Button from '../components/Button';
-import {  TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import Row from '../components/row/Row';
 import Label from '../components/label/Label';
 import { themeGrey } from '../data/staticDatas';
@@ -58,6 +58,7 @@ const Register = ({ navigation }) => {
         dispatch(getAuthActions().register(data))
             .then((res) => {
                 if (res.success) {
+                    dispatch(getCommonSlice().setLoading(false));
                     dispatch(getAuthSlice().setUser(res.data))
                     navigation.navigate('/main')
                 }
